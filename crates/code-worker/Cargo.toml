@@ -1,0 +1,33 @@
+[package]
+name = "code-worker"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "VGI worker bringing tree-sitter source-code structure (symbols, imports, comments, queries) to DuckDB over Apache Arrow"
+
+[[bin]]
+name = "code-worker"
+path = "src/main.rs"
+
+[dependencies]
+vgi.workspace = true
+vgi-rpc.workspace = true
+arrow-array.workspace = true
+arrow-buffer.workspace = true
+arrow-schema.workspace = true
+tree-sitter.workspace = true
+streaming-iterator.workspace = true
+tree-sitter-rust.workspace = true
+tree-sitter-python.workspace = true
+tree-sitter-javascript.workspace = true
+tree-sitter-typescript.workspace = true
+tree-sitter-go.workspace = true
+tree-sitter-java.workspace = true
+tree-sitter-c.workspace = true
+tree-sitter-cpp.workspace = true
+tree-sitter-json.workspace = true
+log = "0.4"
+env_logger = "0.11"

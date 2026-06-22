@@ -1,0 +1,69 @@
+# name: test/sql/symbols.test
+# group: [vgi_code]
+#
+# Table functions: symbols() yields one row per structural symbol; ts_nodes()
+# yields one row per tree-sitter query capture; supported_languages() is the
+# discovery list. Source is supplied as a constant SQL string literal (table
+# functions take constants, not subqueries). Multi-line sources use DuckDB
+# E'...\n...' escape strings so each SQL statement stays on one line (the
+# sqllogictest parser is line-oriented).
+
+require-env VGI_CODE_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'code' AS code (TYPE vgi, LOCATION '${VGI_CODE_WORKER}');
+
+statement ok
+SET search_path = 'code.main';
+
+# symbols() over a small Rust doc, ordered by start line.
+query TTII
+SELECT kind, name, start_line, end_line FROM symbols(E'fn add(a: i32, b: i32) -> i32 { a + b }\nstruct Point { x: i32, y: i32 }\nenum Color { Red, Green }', 'rust') ORDER BY start_line;
+----
+function	add	1	1
+struct	Point	2	2
+enum	Color	3	3
+
+# A second language (Python) parses too.
+query TT
+SELECT kind, name FROM symbols(E'def greet(n):\n    return n', 'python') ORDER BY start_line;
+----
+function	greet
+
+# ts_nodes() capturing every function name in a Go doc.
+query TT rowsort
+SELECT capture, text FROM ts_nodes(E'package m\nfunc Alpha() {}\nfunc Beta() {}', 'go', '(function_declaration name: (identifier) @fn)');
+----
+fn	Alpha
+fn	Beta
+
+# NULL source → no rows (worker stays alive).
+query I
+SELECT count(*) FROM symbols(NULL::VARCHAR, 'rust');
+----
+0
+
+# supported_languages() discovery: non-empty and includes the core languages.
+query I
+SELECT count(*) > 0 FROM supported_languages();
+----
+true
+
+query I
+SELECT count(*) FROM supported_languages() WHERE language IN ('rust','python','go','javascript');
+----
+4
+
+# Unknown language is a clear error.
+statement error
+SELECT * FROM symbols('fn a(){}', 'cobol');
+----
+
+statement ok
+USE memory;
+
+statement ok
+DETACH code;

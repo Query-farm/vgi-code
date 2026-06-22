@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build-test:
+    name: fmt · clippy · build · unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format check
+        run: cargo fmt --all -- --check
+
+      - name: Clippy (deny warnings)
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Unit + integration tests
+        run: cargo test --workspace --all-features
+
+      - name: Build worker (release)
+        run: cargo build --release --bin code-worker
+
+  e2e-sql:
+    name: SQL end-to-end (DuckDB sqllogictest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install haybarn-unittest
+        run: uv tool install haybarn-unittest
+
+      - name: SQL E2E (build release worker + run sqllogictest suite)
+        # `make test-sql` builds target/release/code-worker first, then points
+        # VGI_CODE_WORKER at it and runs the test/sql/*.test suite.
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          make test-sql

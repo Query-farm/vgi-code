@@ -1,0 +1,48 @@
+[workspace]
+resolver = "2"
+members = ["crates/code-worker"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.86"
+license = "MIT"
+authors = ["Query Farm LLC <hello@query.farm>"]
+repository = "https://github.com/Query-farm/vgi-code"
+
+[workspace.dependencies]
+# VGI Rust SDK (worker side), published on crates.io. Pulls in vgi-rpc 0.2 and
+# arrow 58 transitively; keep arrow/vgi-rpc here in lockstep with vgi's pins so a
+# single arrow/vgi-rpc resolves.
+vgi = "0.5.0"
+vgi-rpc = { version = "0.2.0", default-features = false, features = ["macros", "http"] }
+arrow-array = "58"
+arrow-buffer = "58"
+arrow-schema = "58"
+
+# tree-sitter parsing core. Pinned to the 0.25 line: its MSRV (1.76) is under the
+# workspace rust-version (1.86), and — like every grammar crate below — it depends
+# only on the ABI-stable `tree-sitter-language ^0.1` shim, so the grammars' exported
+# `LANGUAGE: LanguageFn` constants unify with this core. (0.25's `Query` matches are
+# a `streaming-iterator`, hence the `streaming-iterator` dep.) 0.26 also works but
+# we stay on the well-worn 0.25 line.
+tree-sitter = "0.25"
+streaming-iterator = "0.1"
+
+# Grammar crates. Each exposes a `LANGUAGE: LanguageFn` (via `tree-sitter-language
+# ^0.1`) and is otherwise independent of the core version — that shim is what makes
+# the otherwise-divergent grammar versions (0.23–0.25) all link against one
+# `tree-sitter` core. Versions are the latest stable for each as of pinning. All
+# crates are MIT (grammars) / MIT-or-Apache — documented in README/CLAUDE.md.
+tree-sitter-rust = "0.24"
+tree-sitter-python = "0.25"
+tree-sitter-javascript = "0.25"
+tree-sitter-typescript = "0.23"
+tree-sitter-go = "0.25"
+tree-sitter-java = "0.23"
+tree-sitter-c = "0.24"
+tree-sitter-cpp = "0.23"
+tree-sitter-json = "0.24"
+
+[profile.release]
+opt-level = 2

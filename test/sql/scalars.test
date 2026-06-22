@@ -1,0 +1,67 @@
+# name: test/sql/scalars.test
+# group: [vgi_code]
+#
+# Scalar functions over source supplied as SQL string literals: language_of,
+# count_lines, loc, count_functions, extract_imports (via UNNEST), and ts_query.
+# Multi-line sources use DuckDB E'...\n...' escape strings so each SQL statement
+# stays on one line (the sqllogictest parser is line-oriented).
+
+require-env VGI_CODE_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'code' AS code (TYPE vgi, LOCATION '${VGI_CODE_WORKER}');
+
+statement ok
+SET search_path = 'code.main';
+
+# language_of infers from the extension.
+query TTT
+SELECT language_of('main.rs'), language_of('app.py'), language_of('Makefile');
+----
+rust	python	NULL
+
+# count_functions over a two-function Rust doc.
+query I
+SELECT count_functions(E'fn a() {}\nfn b() {}', 'rust');
+----
+2
+
+# loc excludes blank + comment-only lines; count_lines counts every line.
+query II
+SELECT count_lines(E'// header\nfn a() {}\n\nfn b() {}'), loc(E'// header\nfn a() {}\n\nfn b() {}', 'rust');
+----
+4	2
+
+# extract_imports → UNNEST into one row per import.
+query T rowsort
+SELECT UNNEST(extract_imports(E'import os\nfrom sys import argv', 'python'));
+----
+from sys import argv
+import os
+
+# ts_query power feature: capture every function name in the source.
+query T rowsort
+SELECT UNNEST(ts_query(E'fn alpha() {}\nfn beta() {}', 'rust', '(function_item name: (identifier) @n)'));
+----
+alpha
+beta
+
+# NULL source → NULL.
+query I
+SELECT count_functions(NULL::VARCHAR, 'rust') IS NULL;
+----
+true
+
+# Unknown language is a clear error.
+statement error
+SELECT loc('fn a(){}', 'cobol');
+----
+
+statement ok
+USE memory;
+
+statement ok
+DETACH code;

@@ -4,7 +4,9 @@
 
 <p align="center"><em>A <a href="https://query.farm">Query.Farm</a> VGI worker for DuckDB.</em></p>
 
-# vgi-code
+# Parse Source Code with Tree-sitter — Symbols, Imports & Comments in DuckDB
+
+> **vgi-code** · a [Query.Farm](https://query.farm) VGI worker · powered by tree-sitter
 
 A [VGI](https://query.farm) worker (Rust, a compiled binary) that brings
 **source-code structure** — symbols, imports, comments, string literals, line

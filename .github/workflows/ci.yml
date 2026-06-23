@@ -48,6 +48,11 @@ jobs:
       - name: Build worker (release)
         run: cargo build --release --bin code-worker
 
+      - name: cargo doc (deny warnings)
+        run: cargo doc --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: -D warnings
+
   # Resolve the latest published haybarn release once, so the whole matrix tests
   # the same version (and we never hardcode/pin it).
   resolve-haybarn:

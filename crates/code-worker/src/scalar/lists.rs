@@ -6,7 +6,10 @@
 //! is built identically at `on_bind` and `process` (the explicit match LIST returns
 //! require). NULL source → NULL list; an unknown language → clear error.
 
-use vgi::{ArgSpec, BindParams, BindResponse, FunctionMetadata, ProcessParams, ScalarFunction};
+use vgi::{
+    ArgSpec, BindParams, BindResponse, FunctionExample, FunctionMetadata, ProcessParams,
+    ScalarFunction,
+};
 use vgi_rpc::{Result, RpcError};
 
 use crate::arrow_io::{
@@ -40,6 +43,8 @@ pub struct ExtractList {
     kind: Kind,
     name: &'static str,
     desc: &'static str,
+    example_sql: &'static str,
+    example_desc: &'static str,
 }
 
 impl ExtractList {
@@ -48,6 +53,9 @@ impl ExtractList {
             kind: Kind::Imports,
             name: "extract_imports",
             desc: "Import / use / require statements in the source, as a VARCHAR[]",
+            example_sql:
+                "SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python'));",
+            example_desc: "Extract each import statement from Python source, one per row.",
         }
     }
     pub fn comments() -> Self {
@@ -55,6 +63,8 @@ impl ExtractList {
             kind: Kind::Comments,
             name: "extract_comments",
             desc: "Comment texts in the source, as a VARCHAR[]",
+            example_sql: "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust');",
+            example_desc: "Collect the comment texts from Rust source as a VARCHAR[].",
         }
     }
     pub fn strings() -> Self {
@@ -62,6 +72,8 @@ impl ExtractList {
             kind: Kind::Strings,
             name: "extract_strings",
             desc: "String-literal texts in the source, as a VARCHAR[]",
+            example_sql: "SELECT code.main.extract_strings('let s = \"hello\";\n', 'rust');",
+            example_desc: "Collect the string-literal texts from Rust source as a VARCHAR[].",
         }
     }
 }
@@ -75,6 +87,11 @@ impl ScalarFunction for ExtractList {
         FunctionMetadata {
             description: self.desc.into(),
             return_type: Some(list_varchar_type()),
+            examples: vec![FunctionExample {
+                sql: self.example_sql.into(),
+                description: self.example_desc.into(),
+                expected_output: None,
+            }],
             ..Default::default()
         }
     }

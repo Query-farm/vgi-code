@@ -25,11 +25,92 @@ mod parsing;
 mod scalar;
 mod table;
 
+use vgi::catalog::{CatSchema, CatalogModel};
 use vgi::Worker;
 
 /// Worker version string, surfaced by `code_version()`.
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
+}
+
+/// Catalog + schema metadata (description, provenance) surfaced to DuckDB and
+/// the `vgi-lint` metadata-quality linter. The function objects themselves are
+/// served from the registered scalars/tables; this only adds catalog/schema-level
+/// comments and tags.
+fn catalog_metadata(name: &str) -> CatalogModel {
+    CatalogModel {
+        name: name.to_string(),
+        comment: Some(
+            "Source-code structure for DuckDB: tree-sitter symbols, imports, comments, strings, \
+             line counts and arbitrary tree-sitter queries."
+                .to_string(),
+        ),
+        tags: vec![
+            (
+                "vgi.description_llm".to_string(),
+                "Parse source code with tree-sitter and expose its structure to SQL. Infer a \
+                 file's language from its name, count physical lines / lines-of-code / function \
+                 definitions, extract imports, comments and string literals as arrays, run \
+                 arbitrary tree-sitter queries, and list structural symbols (functions, classes, \
+                 methods, structs, enums, …). Supports rust, python, javascript, typescript, go, \
+                 java, c, cpp and json. Use for code analysis, metrics and structural search in SQL."
+                    .to_string(),
+            ),
+            (
+                "vgi.description_md".to_string(),
+                "# code\n\nSource-code structure over Apache Arrow, powered by \
+                 [tree-sitter](https://tree-sitter.github.io/).\n\nScalars: `language_of`, \
+                 `count_lines`, `loc`, `count_functions`, `extract_imports`, `extract_comments`, \
+                 `extract_strings`, `ts_query`, `code_version`. Tables: `symbols`, `ts_nodes`, \
+                 `supported_languages`.\n\nSupported languages: rust, python, javascript, \
+                 typescript, go, java, c, cpp, json."
+                    .to_string(),
+            ),
+            ("vgi.author".to_string(), "Query.Farm".to_string()),
+            (
+                "vgi.copyright".to_string(),
+                "Copyright 2026 Query Farm LLC - https://query.farm".to_string(),
+            ),
+            ("vgi.license".to_string(), "MIT".to_string()),
+            (
+                "vgi.support_contact".to_string(),
+                "https://github.com/Query-farm/vgi-code/issues".to_string(),
+            ),
+            (
+                "vgi.support_policy_url".to_string(),
+                "https://github.com/Query-farm/vgi-code/blob/main/README.md".to_string(),
+            ),
+        ],
+        source_url: Some("https://github.com/Query-farm/vgi-code".to_string()),
+        schemas: vec![CatSchema {
+            name: "main".to_string(),
+            comment: Some(
+                "Source-code structure functions: language detection, line/function counts, \
+                 import/comment/string extraction, tree-sitter queries and symbol listing."
+                    .to_string(),
+            ),
+            tags: vec![
+                (
+                    "vgi.description_llm".to_string(),
+                    "Source-code structure functions: detect a file's language, count lines / \
+                     lines-of-code / functions, extract imports, comments and strings as arrays, \
+                     run tree-sitter queries, and list structural symbols across rust, python, \
+                     javascript, typescript, go, java, c, cpp and json."
+                        .to_string(),
+                ),
+                (
+                    "vgi.description_md".to_string(),
+                    "Source-code structure functions (symbols, imports, comments, strings, line \
+                     counts and tree-sitter queries) over Apache Arrow."
+                        .to_string(),
+                ),
+            ],
+            views: Vec::new(),
+            macros: Vec::new(),
+            tables: Vec::new(),
+        }],
+        ..Default::default()
+    }
 }
 
 fn main() {
@@ -43,9 +124,12 @@ fn main() {
     if std::env::var_os("VGI_WORKER_CATALOG_NAME").is_none() {
         std::env::set_var("VGI_WORKER_CATALOG_NAME", "code");
     }
+    let catalog_name =
+        std::env::var("VGI_WORKER_CATALOG_NAME").unwrap_or_else(|_| "code".to_string());
 
     let mut worker = Worker::new();
     scalar::register(&mut worker);
     table::register(&mut worker);
+    worker.set_catalog(catalog_metadata(&catalog_name));
     worker.run();
 }

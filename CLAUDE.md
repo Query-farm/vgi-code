@@ -14,7 +14,7 @@ plus a curated set of grammar crates.
 ## Layout
 
 ```
-Cargo.toml                          workspace; pins vgi = "0.5.0", tree-sitter + grammars
+Cargo.toml                          workspace; pins vgi = "0.9.0", tree-sitter + grammars
 crates/code-worker/
   src/main.rs                       Worker::new(); registers scalars + tables
   src/parsing.rs                    PURE logic (no Arrow): language registry, parse,

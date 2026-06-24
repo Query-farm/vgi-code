@@ -30,6 +30,14 @@ impl TableFunction for SupportedLanguages {
     fn metadata(&self) -> FunctionMetadata {
         FunctionMetadata {
             description: "List the language ids this worker can parse".into(),
+            tags: vec![(
+                "vgi.columns_md".into(),
+                "| column | type | description |\n\
+                 |---|---|---|\n\
+                 | `language` | VARCHAR | A language id accepted by the other functions, e.g. \
+                 `rust`, `python`, `go`. |"
+                    .into(),
+            )],
             ..Default::default()
         }
     }

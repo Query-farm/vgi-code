@@ -4,7 +4,10 @@ use std::sync::Arc;
 
 use arrow_array::{ArrayRef, RecordBatch, StringArray};
 use arrow_schema::DataType;
-use vgi::{ArgSpec, BindParams, BindResponse, FunctionMetadata, ProcessParams, ScalarFunction};
+use vgi::{
+    ArgSpec, BindParams, BindResponse, FunctionExample, FunctionMetadata, ProcessParams,
+    ScalarFunction,
+};
 use vgi_rpc::{Result, RpcError};
 
 pub struct CodeVersion;
@@ -18,6 +21,11 @@ impl ScalarFunction for CodeVersion {
         FunctionMetadata {
             description: "Returns the code worker version string".into(),
             return_type: Some(DataType::Utf8),
+            examples: vec![FunctionExample {
+                sql: "SELECT code.main.code_version();".into(),
+                description: "Return the running code worker's version string.".into(),
+                expected_output: None,
+            }],
             ..Default::default()
         }
     }

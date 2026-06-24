@@ -42,6 +42,17 @@ impl TableFunction for TsNodes {
             description:
                 "Tree-sitter query matches over a source doc as (seq, capture, text, start_line, end_line) rows"
                     .into(),
+            tags: vec![(
+                "vgi.columns_md".into(),
+                "| column | type | description |\n\
+                 |---|---|---|\n\
+                 | `seq` | BIGINT | 0-based capture index in document order. |\n\
+                 | `capture` | VARCHAR | The query capture name (the `@name` in the query). |\n\
+                 | `text` | VARCHAR | The captured node's source text. |\n\
+                 | `start_line` | INTEGER | 1-based line where the captured node starts. |\n\
+                 | `end_line` | INTEGER | 1-based line where the captured node ends. |"
+                    .into(),
+            )],
             ..Default::default()
         }
     }

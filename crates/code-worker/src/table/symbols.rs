@@ -42,6 +42,17 @@ impl TableFunction for Symbols {
             description:
                 "Structural symbols (functions, classes, methods, structs, enums, …) of a source doc"
                     .into(),
+            tags: vec![(
+                "vgi.columns_md".into(),
+                "| column | type | description |\n\
+                 |---|---|---|\n\
+                 | `kind` | VARCHAR | Symbol kind: `function`, `method`, `class`, `struct`, \
+                 `enum`, `interface`, `trait`. |\n\
+                 | `name` | VARCHAR | The symbol's identifier (NULL when anonymous). |\n\
+                 | `start_line` | INTEGER | 1-based line where the definition starts. |\n\
+                 | `end_line` | INTEGER | 1-based line where the definition ends. |"
+                    .into(),
+            )],
             ..Default::default()
         }
     }

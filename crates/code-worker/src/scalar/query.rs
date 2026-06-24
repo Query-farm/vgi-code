@@ -4,7 +4,10 @@
 //! NULL source / language / query → NULL list. An unknown language or a malformed
 //! query is a clear error (both are caller mistakes).
 
-use vgi::{ArgSpec, BindParams, BindResponse, FunctionMetadata, ProcessParams, ScalarFunction};
+use vgi::{
+    ArgSpec, BindParams, BindResponse, FunctionExample, FunctionMetadata, ProcessParams,
+    ScalarFunction,
+};
 use vgi_rpc::{Result, RpcError};
 
 use crate::arrow_io::{
@@ -29,6 +32,15 @@ impl ScalarFunction for TsQuery {
                 "Run a tree-sitter query over the source and return the captured node texts (VARCHAR[])"
                     .into(),
             return_type: Some(list_varchar_type()),
+            examples: vec![FunctionExample {
+                sql: "SELECT code.main.ts_query('fn alpha() {}\nfn beta() {}\n', 'rust', \
+                      '(function_item name: (identifier) @n)');"
+                    .into(),
+                description: "Run a tree-sitter query and return captured node texts \
+                              (here, the two function names)."
+                    .into(),
+                expected_output: None,
+            }],
             ..Default::default()
         }
     }

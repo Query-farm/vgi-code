@@ -11,7 +11,10 @@ use std::sync::Arc;
 use arrow_array::builder::Int32Builder;
 use arrow_array::{ArrayRef, RecordBatch};
 use arrow_schema::DataType;
-use vgi::{ArgSpec, BindParams, BindResponse, FunctionMetadata, ProcessParams, ScalarFunction};
+use vgi::{
+    ArgSpec, BindParams, BindResponse, FunctionExample, FunctionMetadata, ProcessParams,
+    ScalarFunction,
+};
 use vgi_rpc::{Result, RpcError};
 
 use crate::arrow_io::text_str;
@@ -33,6 +36,11 @@ impl ScalarFunction for CountLines {
         FunctionMetadata {
             description: "Total number of physical lines in the source (NULL → NULL)".into(),
             return_type: Some(DataType::Int32),
+            examples: vec![FunctionExample {
+                sql: "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n');".into(),
+                description: "Count the physical lines in a source string (→ 2).".into(),
+                expected_output: None,
+            }],
             ..Default::default()
         }
     }
@@ -74,6 +82,11 @@ impl ScalarFunction for Loc {
             description: "Lines of code: non-blank, non-comment lines for the given language"
                 .into(),
             return_type: Some(DataType::Int32),
+            examples: vec![FunctionExample {
+                sql: "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust');".into(),
+                description: "Count lines of code, excluding blank and comment lines (→ 2).".into(),
+                expected_output: None,
+            }],
             ..Default::default()
         }
     }
@@ -122,6 +135,13 @@ impl ScalarFunction for CountFunctions {
         FunctionMetadata {
             description: "Number of function/method definitions for the given language".into(),
             return_type: Some(DataType::Int32),
+            examples: vec![FunctionExample {
+                sql:
+                    "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python');"
+                        .into(),
+                description: "Count function/method definitions in the source (→ 2).".into(),
+                expected_output: None,
+            }],
             ..Default::default()
         }
     }

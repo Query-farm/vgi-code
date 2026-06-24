@@ -6,7 +6,10 @@ use std::sync::Arc;
 use arrow_array::builder::StringBuilder;
 use arrow_array::{ArrayRef, RecordBatch};
 use arrow_schema::DataType;
-use vgi::{ArgSpec, BindParams, BindResponse, FunctionMetadata, ProcessParams, ScalarFunction};
+use vgi::{
+    ArgSpec, BindParams, BindResponse, FunctionExample, FunctionMetadata, ProcessParams,
+    ScalarFunction,
+};
 use vgi_rpc::{Result, RpcError};
 
 use crate::arrow_io::text_str;
@@ -24,6 +27,12 @@ impl ScalarFunction for LanguageOf {
             description: "Infer the source language from a filename's extension (NULL if unknown)"
                 .into(),
             return_type: Some(DataType::Utf8),
+            examples: vec![FunctionExample {
+                sql: "SELECT code.main.language_of('src/main.rs');".into(),
+                description: "Detect the source language of a file from its extension (→ 'rust')."
+                    .into(),
+                expected_output: None,
+            }],
             ..Default::default()
         }
     }

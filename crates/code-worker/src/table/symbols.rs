@@ -38,21 +38,36 @@ impl TableFunction for Symbols {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        let mut tags = crate::meta::object_tags(
+            "Source Symbols Listing",
+            "List the structural symbols of one source document — functions, methods, classes, \
+             structs, enums, interfaces and traits — one row each, ordered by start line, with \
+             their kind, name and 1-based line span. `source` and `language` are bind-time \
+             constants. NULL source \u{2192} no rows; malformed source is best-effort (tree-\
+             sitter recovers); an unknown language is a clear error. Use it to outline or index \
+             a file's definitions.",
+            "Structural symbols of a source doc as `(kind, name, start_line, end_line)` rows, \
+             e.g. `symbols('fn a() {}', 'rust')`.",
+            "symbols, outline, definitions, functions, classes, methods, structs, enums, traits, \
+             interfaces, code index, navigation, table of contents",
+            "table/symbols.rs",
+        );
+        tags.push((
+            "vgi.columns_md".into(),
+            "| column | type | description |\n\
+             |---|---|---|\n\
+             | `kind` | VARCHAR | Symbol kind: `function`, `method`, `class`, `struct`, \
+             `enum`, `interface`, `trait`. |\n\
+             | `name` | VARCHAR | The symbol's identifier (NULL when anonymous). |\n\
+             | `start_line` | INTEGER | 1-based line where the definition starts. |\n\
+             | `end_line` | INTEGER | 1-based line where the definition ends. |"
+                .into(),
+        ));
         FunctionMetadata {
             description:
                 "Structural symbols (functions, classes, methods, structs, enums, …) of a source doc"
                     .into(),
-            tags: vec![(
-                "vgi.columns_md".into(),
-                "| column | type | description |\n\
-                 |---|---|---|\n\
-                 | `kind` | VARCHAR | Symbol kind: `function`, `method`, `class`, `struct`, \
-                 `enum`, `interface`, `trait`. |\n\
-                 | `name` | VARCHAR | The symbol's identifier (NULL when anonymous). |\n\
-                 | `start_line` | INTEGER | 1-based line where the definition starts. |\n\
-                 | `end_line` | INTEGER | 1-based line where the definition ends. |"
-                    .into(),
-            )],
+            tags,
             ..Default::default()
         }
     }

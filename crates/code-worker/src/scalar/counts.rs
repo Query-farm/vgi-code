@@ -41,6 +41,16 @@ impl ScalarFunction for CountLines {
                 description: "Count the physical lines in a source string (→ 2).".into(),
                 expected_output: None,
             }],
+            tags: crate::meta::object_tags(
+                "Count Physical Lines",
+                "Count the total number of physical lines in a source string, including blank \
+                 and comment lines. Language-agnostic (no parsing). Returns NULL when the source \
+                 is NULL. Use it for raw file-size / line-count metrics.",
+                "Total physical lines in the source, e.g. \
+                 `count_lines('a\\nb\\n')` \u{2192} `2`. NULL in \u{2192} NULL.",
+                "count lines, line count, physical lines, total lines, file size, metrics, wc -l",
+                "scalar/counts.rs",
+            ),
             ..Default::default()
         }
     }
@@ -87,6 +97,18 @@ impl ScalarFunction for Loc {
                 description: "Count lines of code, excluding blank and comment lines (→ 2).".into(),
                 expected_output: None,
             }],
+            tags: crate::meta::object_tags(
+                "Lines Of Code",
+                "Count the lines of code (LOC) in a source string for a given language: physical \
+                 lines that are neither blank nor purely comments. Returns NULL when the source \
+                 or language is NULL; an unknown language id is a clear error. Use it for code-\
+                 size metrics that ignore whitespace and comments.",
+                "Non-blank, non-comment lines for a language, e.g. \
+                 `loc(src, 'rust')`. NULL in \u{2192} NULL; unknown language errors.",
+                "lines of code, loc, sloc, code metrics, non-comment lines, effective lines, \
+                 source lines",
+                "scalar/counts.rs",
+            ),
             ..Default::default()
         }
     }
@@ -142,6 +164,18 @@ impl ScalarFunction for CountFunctions {
                 description: "Count function/method definitions in the source (→ 2).".into(),
                 expected_output: None,
             }],
+            tags: crate::meta::object_tags(
+                "Count Function Definitions",
+                "Count the function and method definitions in a source string for a given \
+                 language, using tree-sitter to find definition nodes. Returns NULL when the \
+                 source or language is NULL; an unknown language id is a clear error. Use it as a \
+                 quick structural metric of how many functions a file defines.",
+                "Number of function/method definitions for a language, e.g. \
+                 `count_functions(src, 'python')` \u{2192} `2`.",
+                "count functions, function count, number of functions, methods, definitions, \
+                 code metrics, complexity",
+                "scalar/counts.rs",
+            ),
             ..Default::default()
         }
     }

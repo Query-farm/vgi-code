@@ -38,21 +38,36 @@ impl TableFunction for TsNodes {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        let mut tags = crate::meta::object_tags(
+            "Tree-Sitter Query Nodes",
+            "Run a tree-sitter S-expression query over one source document and return every \
+             capture as a row: a document-order sequence number, the capture name, the captured \
+             node's text, and its 1-based line span. `source`, `language` and `query` are bind-\
+             time constants. NULL source \u{2192} no rows; an unknown language or malformed query \
+             is a clear error. The table-shaped counterpart to ts_query, for rich structural \
+             extraction.",
+            "Tree-sitter query captures as `(seq, capture, text, start_line, end_line)` rows, \
+             e.g. `ts_nodes(src, 'rust', '(function_item) @f')`.",
+            "tree-sitter, ts_nodes, query, captures, structural search, ast, nodes, \
+             s-expression, syntax tree, extraction",
+            "table/ts_nodes.rs",
+        );
+        tags.push((
+            "vgi.columns_md".into(),
+            "| column | type | description |\n\
+             |---|---|---|\n\
+             | `seq` | BIGINT | 0-based capture index in document order. |\n\
+             | `capture` | VARCHAR | The query capture name (the `@name` in the query). |\n\
+             | `text` | VARCHAR | The captured node's source text. |\n\
+             | `start_line` | INTEGER | 1-based line where the captured node starts. |\n\
+             | `end_line` | INTEGER | 1-based line where the captured node ends. |"
+                .into(),
+        ));
         FunctionMetadata {
             description:
                 "Tree-sitter query matches over a source doc as (seq, capture, text, start_line, end_line) rows"
                     .into(),
-            tags: vec![(
-                "vgi.columns_md".into(),
-                "| column | type | description |\n\
-                 |---|---|---|\n\
-                 | `seq` | BIGINT | 0-based capture index in document order. |\n\
-                 | `capture` | VARCHAR | The query capture name (the `@name` in the query). |\n\
-                 | `text` | VARCHAR | The captured node's source text. |\n\
-                 | `start_line` | INTEGER | 1-based line where the captured node starts. |\n\
-                 | `end_line` | INTEGER | 1-based line where the captured node ends. |"
-                    .into(),
-            )],
+            tags,
             ..Default::default()
         }
     }

@@ -45,6 +45,10 @@ pub struct ExtractList {
     desc: &'static str,
     example_sql: &'static str,
     example_desc: &'static str,
+    title: &'static str,
+    llm_desc: &'static str,
+    md_desc: &'static str,
+    keywords: &'static str,
 }
 
 impl ExtractList {
@@ -56,6 +60,16 @@ impl ExtractList {
             example_sql:
                 "SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python'));",
             example_desc: "Extract each import statement from Python source, one per row.",
+            title: "Extract Import Statements",
+            llm_desc:
+                "Extract the import / use / require statements from a source string for a given \
+                 language, returned as a VARCHAR[] of the statement texts. NULL source or \
+                 language \u{2192} NULL list; an empty source \u{2192} empty list; an unknown \
+                 language is a clear error. Use it to discover a file's dependencies.",
+            md_desc: "Import/use/require statements as a `VARCHAR[]`, e.g. \
+                 `extract_imports(src, 'python')`.",
+            keywords: "imports, extract imports, dependencies, use statements, require, include, \
+                 import list, modules",
         }
     }
     pub fn comments() -> Self {
@@ -65,6 +79,15 @@ impl ExtractList {
             desc: "Comment texts in the source, as a VARCHAR[]",
             example_sql: "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust');",
             example_desc: "Collect the comment texts from Rust source as a VARCHAR[].",
+            title: "Extract Comment Texts",
+            llm_desc:
+                "Extract the comment texts (line and block comments) from a source string for a \
+                 given language, returned as a VARCHAR[]. NULL source or language \u{2192} NULL \
+                 list; empty source \u{2192} empty list; an unknown language is a clear error. \
+                 Use it to mine documentation, TODOs, or license headers.",
+            md_desc: "Comment texts as a `VARCHAR[]`, e.g. `extract_comments(src, 'rust')`.",
+            keywords: "comments, extract comments, docstrings, todo, fixme, documentation, \
+                 license header, annotations",
         }
     }
     pub fn strings() -> Self {
@@ -74,6 +97,16 @@ impl ExtractList {
             desc: "String-literal texts in the source, as a VARCHAR[]",
             example_sql: "SELECT code.main.extract_strings('let s = \"hello\";\n', 'rust');",
             example_desc: "Collect the string-literal texts from Rust source as a VARCHAR[].",
+            title: "Extract String Literals",
+            llm_desc:
+                "Extract the string-literal texts from a source string for a given language, \
+                 returned as a VARCHAR[] (the literals including their quotes). NULL source or \
+                 language \u{2192} NULL list; empty source \u{2192} empty list; an unknown \
+                 language is a clear error. Use it to find hard-coded strings, secrets, or URLs.",
+            md_desc: "String-literal texts as a `VARCHAR[]`, e.g. `extract_strings(src, 'rust')`.",
+            keywords:
+                "strings, extract strings, string literals, hardcoded strings, secrets, urls, \
+                 text literals",
         }
     }
 }
@@ -92,6 +125,13 @@ impl ScalarFunction for ExtractList {
                 description: self.example_desc.into(),
                 expected_output: None,
             }],
+            tags: crate::meta::object_tags(
+                self.title,
+                self.llm_desc,
+                self.md_desc,
+                self.keywords,
+                "scalar/lists.rs",
+            ),
             ..Default::default()
         }
     }

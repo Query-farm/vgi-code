@@ -26,6 +26,15 @@ impl ScalarFunction for CodeVersion {
                 description: "Return the running code worker's version string.".into(),
                 expected_output: None,
             }],
+            tags: crate::meta::object_tags(
+                "Code Worker Version",
+                "Return the running code worker's semantic version string. Takes no arguments \
+                 and always returns one VARCHAR. Use it to confirm which build is attached or to \
+                 gate behavior on a worker version.",
+                "Return the code worker's version string, e.g. `code_version()` \u{2192} `'0.1.0'`.",
+                "version, code_version, build, semantic version, worker version, release",
+                "scalar/version.rs",
+            ),
             ..Default::default()
         }
     }

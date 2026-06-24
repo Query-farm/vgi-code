@@ -41,6 +41,18 @@ impl ScalarFunction for TsQuery {
                     .into(),
                 expected_output: None,
             }],
+            tags: crate::meta::object_tags(
+                "Run Tree-Sitter Query",
+                "Run an arbitrary tree-sitter S-expression query over a source string for a \
+                 given language and return every captured node's text as a VARCHAR[]. The power \
+                 feature for ad-hoc structural search. NULL source/language/query \u{2192} NULL \
+                 list; an unknown language or a malformed query is a clear error.",
+                "Run a tree-sitter query and return captured node texts as a `VARCHAR[]`, e.g. \
+                 `ts_query(src, 'rust', '(function_item name: (identifier) @n)')`.",
+                "tree-sitter, ts_query, query, structural search, capture, ast query, \
+                 s-expression, pattern match, syntax tree",
+                "scalar/query.rs",
+            ),
             ..Default::default()
         }
     }

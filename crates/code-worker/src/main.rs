@@ -21,6 +21,7 @@
 //! modules are thin Arrow adapters over it.
 
 mod arrow_io;
+mod meta;
 mod parsing;
 mod scalar;
 mod table;
@@ -46,6 +47,17 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                 .to_string(),
         ),
         tags: vec![
+            (
+                "vgi.title".to_string(),
+                "Source-Code Structure Analysis".to_string(),
+            ),
+            (
+                "vgi.keywords".to_string(),
+                "code, source code, tree-sitter, parsing, symbols, functions, imports, comments, \
+                 string literals, lines of code, loc, language detection, syntax tree, static \
+                 analysis, rust, python, javascript, typescript, go, java, c, cpp, json"
+                    .to_string(),
+            ),
             (
                 "vgi.description_llm".to_string(),
                 "Parse source code with tree-sitter and expose its structure to SQL. Infer a \
@@ -90,6 +102,23 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                     .to_string(),
             ),
             tags: vec![
+                ("vgi.title".to_string(), "Code — main".to_string()),
+                (
+                    "vgi.keywords".to_string(),
+                    "code, tree-sitter, language_of, count_lines, loc, count_functions, \
+                     extract_imports, extract_comments, extract_strings, ts_query, symbols, \
+                     ts_nodes, supported_languages, parsing, static analysis, syntax tree"
+                        .to_string(),
+                ),
+                // VGI123 classifying tags (bare keys: domain/category/topic) for faceting.
+                ("domain".to_string(), "software-engineering".to_string()),
+                ("category".to_string(), "code-analysis".to_string()),
+                ("topic".to_string(), "source-structure".to_string()),
+                (
+                    "vgi.source_url".to_string(),
+                    "https://github.com/Query-farm/vgi-code/blob/main/crates/code-worker/src/main.rs"
+                        .to_string(),
+                ),
                 (
                     "vgi.description_llm".to_string(),
                     "Source-code structure functions: detect a file's language, count lines / \
@@ -102,6 +131,18 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                     "vgi.description_md".to_string(),
                     "Source-code structure functions (symbols, imports, comments, strings, line \
                      counts and tree-sitter queries) over Apache Arrow."
+                        .to_string(),
+                ),
+                // VGI506 representative example queries for the schema.
+                (
+                    "vgi.example_queries".to_string(),
+                    "SELECT code.main.language_of('src/main.rs');\n\
+                     SELECT code.main.count_lines('fn a() {}\nfn b() {}\n');\n\
+                     SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust');\n\
+                     SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python');\n\
+                     SELECT code.main.extract_imports('import os\nimport sys\n', 'python');\n\
+                     SELECT * FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust');\n\
+                     SELECT * FROM code.main.supported_languages();"
                         .to_string(),
                 ),
             ],

@@ -33,6 +33,18 @@ impl ScalarFunction for LanguageOf {
                     .into(),
                 expected_output: None,
             }],
+            tags: crate::meta::object_tags(
+                "Detect Source Language",
+                "Infer the programming language of a file from its name or path extension, e.g. \
+                 'src/main.rs' \u{2192} 'rust', 'app.py' \u{2192} 'python'. Returns NULL when the \
+                 filename is NULL or its extension maps to no supported language. Use it to route \
+                 files to the right language id for the other functions.",
+                "Infer a file's language from its extension, e.g. \
+                 `language_of('main.rs')` \u{2192} `'rust'`. NULL if unknown.",
+                "language detection, language_of, detect language, file extension, file type, \
+                 guess language, rust, python, javascript, typescript, go, java, c, cpp, json",
+                "scalar/language.rs",
+            ),
             ..Default::default()
         }
     }

@@ -53,7 +53,7 @@ impl TableFunction for Symbols {
             "table/symbols.rs",
         );
         tags.push((
-            "vgi.columns_md".into(),
+            "vgi.result_columns_md".into(),
             "| column | type | description |\n\
              |---|---|---|\n\
              | `kind` | VARCHAR | Symbol kind: `function`, `method`, `class`, `struct`, \

@@ -83,7 +83,7 @@ impl TableFunction for SupportedLanguages {
             "table/supported_languages.rs",
         );
         tags.push((
-            "vgi.columns_md".into(),
+            "vgi.result_columns_md".into(),
             "| column | type | description |\n\
              |---|---|---|\n\
              | `language` | VARCHAR | A language id accepted by the other functions, e.g. \

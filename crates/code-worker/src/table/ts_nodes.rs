@@ -53,7 +53,7 @@ impl TableFunction for TsNodes {
             "table/ts_nodes.rs",
         );
         tags.push((
-            "vgi.columns_md".into(),
+            "vgi.result_columns_md".into(),
             "| column | type | description |\n\
              |---|---|---|\n\
              | `seq` | BIGINT | 0-based capture index in document order. |\n\

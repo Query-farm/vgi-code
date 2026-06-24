@@ -59,7 +59,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                     .to_string(),
             ),
             (
-                "vgi.description_llm".to_string(),
+                "vgi.doc_llm".to_string(),
                 "Parse source code with tree-sitter and expose its structure to SQL. Infer a \
                  file's language from its name, count physical lines / lines-of-code / function \
                  definitions, extract imports, comments and string literals as arrays, run \
@@ -69,7 +69,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                     .to_string(),
             ),
             (
-                "vgi.description_md".to_string(),
+                "vgi.doc_md".to_string(),
                 "# code\n\nSource-code structure over Apache Arrow, powered by \
                  [tree-sitter](https://tree-sitter.github.io/).\n\nScalars: `language_of`, \
                  `count_lines`, `loc`, `count_functions`, `extract_imports`, `extract_comments`, \
@@ -120,7 +120,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                         .to_string(),
                 ),
                 (
-                    "vgi.description_llm".to_string(),
+                    "vgi.doc_llm".to_string(),
                     "Source-code structure functions: detect a file's language, count lines / \
                      lines-of-code / functions, extract imports, comments and strings as arrays, \
                      run tree-sitter queries, and list structural symbols across rust, python, \
@@ -128,7 +128,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                         .to_string(),
                 ),
                 (
-                    "vgi.description_md".to_string(),
+                    "vgi.doc_md".to_string(),
                     "Source-code structure functions (symbols, imports, comments, strings, line \
                      counts and tree-sitter queries) over Apache Arrow."
                         .to_string(),

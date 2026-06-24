@@ -69,13 +69,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
   integration:
-    name: SQL end-to-end (DuckDB sqllogictest)
+    # SQL end-to-end across every transport the vgi extension supports. The SAME
+    # test/sql/*.test suite runs three ways — the only difference is the LOCATION
+    # the .test files ATTACH (ci/run-integration.sh sets VGI_CODE_WORKER per
+    # transport): subprocess = the stdio worker binary DuckDB spawns; http =
+    # `code-worker --http` (auto port, advertises PORT:<n>); unix = `code-worker
+    # --unix <sock>` (advertises UNIX:<sock>).
+    name: SQL E2E (${{ matrix.transport }}) · ${{ matrix.os }}
     needs: resolve-haybarn
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
+        transport: [subprocess, http, unix]
         include:
           - { os: ubuntu-latest, asset: haybarn_unittest-linux-amd64.zip }
+          - { os: macos-latest,  asset: haybarn_unittest-osx-arm64.zip }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -89,6 +98,10 @@ jobs:
         uses: mozilla-actions/sccache-action@v0.0.9
 
       - name: Build worker (release)
+        # The `http` transport needs the `vgi-rpc` `http` feature; the workspace
+        # already pins `vgi-rpc = { features = ["macros", "http"] }` (and the SDK
+        # `vgi` crate enables HTTP via that), so a plain release build serves all
+        # three transports — no extra cargo features required here.
         run: cargo build --release --bin code-worker
 
       - name: Download haybarn-unittest
@@ -105,11 +118,15 @@ jobs:
       - name: Resolve runner + worker paths
         run: |
           # Absolute paths: run-integration.sh cd's into a staging dir before
-          # invoking the runner, so relative paths would not resolve.
+          # invoking the runner, so relative paths would not resolve. WORKER_BIN
+          # is the compiled binary — used directly as the subprocess LOCATION and
+          # launched in --http / --unix mode for those transports.
           UNITTEST="$PWD/$(find hb -name 'haybarn-unittest' -type f | head -1)"
           chmod +x "$UNITTEST"
           echo "HAYBARN_UNITTEST=$UNITTEST" >> "$GITHUB_ENV"
-          echo "VGI_CODE_WORKER=$PWD/target/release/code-worker" >> "$GITHUB_ENV"
+          echo "WORKER_BIN=$PWD/target/release/code-worker" >> "$GITHUB_ENV"
 
-      - name: Run extension integration suite
+      - name: Run extension integration suite (${{ matrix.transport }})
         run: ci/run-integration.sh
+        env:
+          TRANSPORT: ${{ matrix.transport }}

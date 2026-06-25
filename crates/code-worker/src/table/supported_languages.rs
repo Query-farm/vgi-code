@@ -57,12 +57,25 @@ const EXECUTABLE_EXAMPLES: &str = r#"[
 
 pub struct SupportedLanguages;
 
-fn output_schema() -> SchemaRef {
+/// The output schema of `supported_languages()` — a single `language VARCHAR`
+/// column. Exposed so the catalog can also surface this parameterless table
+/// function as a regular table (`SELECT * FROM code.main.supported_languages`),
+/// per VGI311. The column carries a `comment` so `duckdb_columns().comment` is
+/// populated when scanned as a table (VGI201/VGI202).
+pub fn output_schema() -> SchemaRef {
+    let mut meta = std::collections::HashMap::new();
+    meta.insert(
+        "comment".to_string(),
+        "A language id this worker can parse (the accepted `language` argument \
+         value for the other functions), e.g. `rust`, `python`, `go`."
+            .to_string(),
+    );
     Arc::new(Schema::new(vec![Field::new(
         "language",
         DataType::Utf8,
         false,
-    )]))
+    )
+    .with_metadata(meta)]))
 }
 
 impl TableFunction for SupportedLanguages {

@@ -59,9 +59,27 @@ impl ScalarFunction for TsQuery {
 
     fn argument_specs(&self) -> Vec<ArgSpec> {
         vec![
-            ArgSpec::any_column("source", 0, "Source code (VARCHAR)"),
-            ArgSpec::any_column("language", 1, "Language id, e.g. 'rust' (VARCHAR)"),
-            ArgSpec::any_column("query", 2, "tree-sitter S-expression query (VARCHAR)"),
+            ArgSpec::column(
+                "source",
+                0,
+                "varchar",
+                "The source code to query, parsed with tree-sitter using the \
+                 grammar selected by `language`.",
+            ),
+            ArgSpec::column(
+                "language",
+                1,
+                "varchar",
+                "The language id selecting the parser grammar, e.g. 'rust', \
+                 'python', 'go'; must be one of supported_languages().",
+            ),
+            ArgSpec::column(
+                "query",
+                2,
+                "varchar",
+                "A tree-sitter S-expression query whose captured nodes' texts are \
+                 returned, e.g. '(function_item name: (identifier) @n)'.",
+            ),
         ]
     }
 

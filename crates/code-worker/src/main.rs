@@ -26,7 +26,9 @@ mod parsing;
 mod scalar;
 mod table;
 
-use vgi::catalog::{CatSchema, CatalogModel};
+use std::sync::Arc;
+
+use vgi::catalog::{CatSchema, CatTable, CatalogModel};
 use vgi::Worker;
 
 /// Worker version string, surfaced by `code_version()`.
@@ -53,9 +55,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
             ),
             (
                 "vgi.keywords".to_string(),
-                "code, source code, tree-sitter, parsing, symbols, functions, imports, comments, \
-                 string literals, lines of code, loc, language detection, syntax tree, static \
-                 analysis, rust, python, javascript, typescript, go, java, c, cpp, json"
+                r#"["code","source code","tree-sitter","parsing","symbols","functions","imports","comments","string literals","lines of code","loc","language detection","syntax tree","static analysis","rust","python","javascript","typescript","go","java","c","cpp","json"]"#
                     .to_string(),
             ),
             (
@@ -105,20 +105,13 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                 ("vgi.title".to_string(), "Code — main".to_string()),
                 (
                     "vgi.keywords".to_string(),
-                    "code, tree-sitter, language_of, count_lines, loc, count_functions, \
-                     extract_imports, extract_comments, extract_strings, ts_query, symbols, \
-                     ts_nodes, supported_languages, parsing, static analysis, syntax tree"
+                    r#"["code","tree-sitter","language_of","count_lines","loc","count_functions","extract_imports","extract_comments","extract_strings","ts_query","symbols","ts_nodes","supported_languages","parsing","static analysis","syntax tree"]"#
                         .to_string(),
                 ),
                 // VGI123 classifying tags (bare keys: domain/category/topic) for faceting.
                 ("domain".to_string(), "software-engineering".to_string()),
                 ("category".to_string(), "code-analysis".to_string()),
                 ("topic".to_string(), "source-structure".to_string()),
-                (
-                    "vgi.source_url".to_string(),
-                    "https://github.com/Query-farm/vgi-code/blob/main/crates/code-worker/src/main.rs"
-                        .to_string(),
-                ),
                 (
                     "vgi.doc_llm".to_string(),
                     "Source-code structure functions: detect a file's language, count lines / \
@@ -129,8 +122,12 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                 ),
                 (
                     "vgi.doc_md".to_string(),
-                    "Source-code structure functions (symbols, imports, comments, strings, line \
-                     counts and tree-sitter queries) over Apache Arrow."
+                    "Source-code structure functions over Apache Arrow, powered by tree-sitter. \
+                     Detect a file's language, count physical lines / lines-of-code / function \
+                     definitions, extract imports, comments and string literals as arrays, run \
+                     arbitrary tree-sitter queries (scalar `ts_query` or table `ts_nodes`), and \
+                     list a file's structural symbols. Supports rust, python, javascript, \
+                     typescript, go, java, c, cpp and json."
                         .to_string(),
                 ),
                 // VGI506 representative example queries for the schema.
@@ -148,10 +145,72 @@ fn catalog_metadata(name: &str) -> CatalogModel {
             ],
             views: Vec::new(),
             macros: Vec::new(),
-            tables: Vec::new(),
+            // Expose the parameterless `supported_languages()` table function as a
+            // regular table too, so consumers can `SELECT * FROM
+            // code.main.supported_languages` (no parentheses). VGI311. The scan is
+            // backed by the same `SupportedLanguages` table function; `with_function`
+            // inlines and auto-registers it (deduped against `table::register`).
+            tables: vec![supported_languages_table()],
         }],
         ..Default::default()
     }
+}
+
+/// The catalog `supported_languages` TABLE: a function-backed table scanning the
+/// `supported_languages()` table function so it can be queried as
+/// `SELECT * FROM code.main.supported_languages` (no parentheses). VGI311.
+fn supported_languages_table() -> CatTable {
+    let mut t = CatTable::with_function(
+        "supported_languages",
+        table::supported_languages_schema(),
+        Arc::new(table::SupportedLanguages),
+        Some(
+            "The language ids this worker can parse, one per row (the accepted \
+             `language` argument values for the other functions)."
+                .to_string(),
+        ),
+        Some(parsing::SUPPORTED.len() as i64),
+    );
+    // `language` (column 0) uniquely identifies each row, so declare it the
+    // primary key (VGI807) — this also satisfies the catalog-level
+    // "no constraints declared" nudge (VGI806).
+    t.primary_key = vec![vec![0]];
+    t.not_null = vec![0];
+    t.tags = vec![
+        (
+            "vgi.title".to_string(),
+            "Parseable Source Languages".to_string(),
+        ),
+        (
+            "vgi.doc_llm".to_string(),
+            "The set of language ids this worker can parse, one per row in the \
+             `language` column. These are the exact values accepted as the `language` \
+             argument by loc, count_functions, the extract_* functions, ts_query, \
+             symbols and ts_nodes. Query it to discover which languages are available."
+                .to_string(),
+        ),
+        (
+            "vgi.doc_md".to_string(),
+            "The language ids this worker can parse (column: `language`)."
+                .to_string(),
+        ),
+        (
+            "vgi.keywords".to_string(),
+            r#"["supported languages","list languages","available languages","language ids","discovery","grammars"]"#
+                .to_string(),
+        ),
+        // VGI123 classifying tags for faceting.
+        ("domain".to_string(), "software-engineering".to_string()),
+        ("category".to_string(), "code-analysis".to_string()),
+        ("topic".to_string(), "source-structure".to_string()),
+        // VGI501 example queries for the table.
+        (
+            "vgi.example_queries".to_string(),
+            r#"[{"description":"List every language id the worker can parse.","sql":"SELECT language FROM code.main.supported_languages ORDER BY language"},{"description":"Check whether a language is supported.","sql":"SELECT count(*) > 0 AS supported FROM code.main.supported_languages WHERE language = 'rust'"}]"#
+                .to_string(),
+        ),
+    ];
+    t
 }
 
 fn main() {

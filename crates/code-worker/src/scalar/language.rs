@@ -50,10 +50,12 @@ impl ScalarFunction for LanguageOf {
     }
 
     fn argument_specs(&self) -> Vec<ArgSpec> {
-        vec![ArgSpec::any_column(
+        vec![ArgSpec::column(
             "filename",
             0,
-            "File name or path (VARCHAR)",
+            "varchar",
+            "The file name or path whose language to infer; only the extension is \
+             used (e.g. 'src/main.rs' or 'app.py').",
         )]
     }
 

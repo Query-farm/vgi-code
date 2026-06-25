@@ -56,7 +56,12 @@ impl ScalarFunction for CountLines {
     }
 
     fn argument_specs(&self) -> Vec<ArgSpec> {
-        vec![ArgSpec::any_column("source", 0, "Source code (VARCHAR)")]
+        vec![ArgSpec::column(
+            "source",
+            0,
+            "varchar",
+            "The source code to count lines in; counted verbatim with no parsing.",
+        )]
     }
 
     fn on_bind(&self, _params: &BindParams) -> Result<BindResponse> {
@@ -115,8 +120,20 @@ impl ScalarFunction for Loc {
 
     fn argument_specs(&self) -> Vec<ArgSpec> {
         vec![
-            ArgSpec::any_column("source", 0, "Source code (VARCHAR)"),
-            ArgSpec::any_column("language", 1, "Language id, e.g. 'rust' (VARCHAR)"),
+            ArgSpec::column(
+                "source",
+                0,
+                "varchar",
+                "The source code to analyze, parsed with tree-sitter using the \
+                 grammar selected by `language`.",
+            ),
+            ArgSpec::column(
+                "language",
+                1,
+                "varchar",
+                "The language id selecting the parser grammar, e.g. 'rust', \
+                 'python', 'go'; must be one of supported_languages().",
+            ),
         ]
     }
 
@@ -182,8 +199,20 @@ impl ScalarFunction for CountFunctions {
 
     fn argument_specs(&self) -> Vec<ArgSpec> {
         vec![
-            ArgSpec::any_column("source", 0, "Source code (VARCHAR)"),
-            ArgSpec::any_column("language", 1, "Language id, e.g. 'rust' (VARCHAR)"),
+            ArgSpec::column(
+                "source",
+                0,
+                "varchar",
+                "The source code to analyze, parsed with tree-sitter using the \
+                 grammar selected by `language`.",
+            ),
+            ArgSpec::column(
+                "language",
+                1,
+                "varchar",
+                "The language id selecting the parser grammar, e.g. 'rust', \
+                 'python', 'go'; must be one of supported_languages().",
+            ),
         ]
     }
 

@@ -74,9 +74,28 @@ impl TableFunction for TsNodes {
 
     fn argument_specs(&self) -> Vec<ArgSpec> {
         vec![
-            ArgSpec::const_arg("source", 0, "varchar", "Source code (VARCHAR)"),
-            ArgSpec::const_arg("language", 1, "varchar", "Language id, e.g. 'rust'"),
-            ArgSpec::const_arg("query", 2, "varchar", "tree-sitter S-expression query"),
+            ArgSpec::const_arg(
+                "source",
+                0,
+                "varchar",
+                "The source document to query, parsed with tree-sitter using the \
+                 grammar selected by `language` (a bind-time constant).",
+            ),
+            ArgSpec::const_arg(
+                "language",
+                1,
+                "varchar",
+                "The language id selecting the parser grammar, e.g. 'rust', \
+                 'python', 'go'; must be one of supported_languages() \
+                 (a bind-time constant).",
+            ),
+            ArgSpec::const_arg(
+                "query",
+                2,
+                "varchar",
+                "A tree-sitter S-expression query; each capture becomes a row, \
+                 e.g. '(function_item) @f' (a bind-time constant).",
+            ),
         ]
     }
 

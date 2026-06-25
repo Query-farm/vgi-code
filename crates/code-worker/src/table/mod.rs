@@ -8,6 +8,8 @@ mod supported_languages;
 mod symbols;
 mod ts_nodes;
 
+pub use supported_languages::{output_schema as supported_languages_schema, SupportedLanguages};
+
 use vgi::Worker;
 
 /// Register every table function on the worker.

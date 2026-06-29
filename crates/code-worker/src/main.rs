@@ -71,6 +71,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
             (
                 "vgi.doc_md".to_string(),
                 "# Source-Code Structure Analysis for DuckDB\n\n\
+                 ![tree-sitter logo](https://raw.githubusercontent.com/tree-sitter/tree-sitter/master/docs/src/assets/images/tree-sitter-small.png)\n\n\
                  Parse, search, and measure source code directly in SQL: extract symbols, \
                  imports, comments, and string literals, count physical lines and function \
                  definitions, and run arbitrary tree-sitter queries across nine programming \

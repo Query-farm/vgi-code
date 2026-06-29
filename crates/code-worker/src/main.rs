@@ -70,12 +70,43 @@ fn catalog_metadata(name: &str) -> CatalogModel {
             ),
             (
                 "vgi.doc_md".to_string(),
-                "# code\n\nSource-code structure over Apache Arrow, powered by \
-                 [tree-sitter](https://tree-sitter.github.io/).\n\nScalars: `language_of`, \
-                 `count_lines`, `loc`, `count_functions`, `extract_imports`, `extract_comments`, \
-                 `extract_strings`, `ts_query`, `code_version`. Tables: `symbols`, `ts_nodes`, \
-                 `supported_languages`.\n\nSupported languages: rust, python, javascript, \
-                 typescript, go, java, c, cpp, json."
+                "# Source-Code Structure Analysis for DuckDB\n\n\
+                 Parse, search, and measure source code directly in SQL: extract symbols, \
+                 imports, comments, and string literals, count physical lines and function \
+                 definitions, and run arbitrary tree-sitter queries across nine programming \
+                 languages — all over Apache Arrow with no language server, no checkout, and \
+                 no external services.\n\n\
+                 The `code` worker turns DuckDB into a lightweight code-intelligence engine for \
+                 developers, data and platform engineers, and security or research teams who need \
+                 to treat large codebases as queryable data. Point it at source held in any \
+                 DuckDB table or file and get structured facts back as ordinary rows and columns. \
+                 Because everything is just SQL, you can join code structure against commits, \
+                 issues, ownership, or CVE data and compute metrics over an entire repository in \
+                 a single query.\n\n\
+                 Parsing is powered by [tree-sitter](https://tree-sitter.github.io/), the fast, \
+                 incremental, error-tolerant parsing library used by editors and code-search tools \
+                 such as Neovim, Zed, and GitHub. Each call builds a concrete syntax tree and runs \
+                 curated per-language tree-sitter queries, so extraction stays accurate even on \
+                 incomplete or malformed input (garbage in yields empty results, never a crash). \
+                 Supported languages are rust, python, javascript, typescript, go, java, c, cpp, \
+                 and json. See the official [tree-sitter documentation](https://tree-sitter.github.io/tree-sitter/) \
+                 and the [tree-sitter source on GitHub](https://github.com/tree-sitter/tree-sitter) \
+                 for grammar and query details.\n\n\
+                 ## Functions and SQL use cases\n\n\
+                 Scalar functions operate per row: `language_of(name)` infers a language from a \
+                 filename; `count_lines(src)`, `loc(src, language)`, and \
+                 `count_functions(src, language)` produce code metrics; `extract_imports`, \
+                 `extract_comments`, and `extract_strings` return `VARCHAR[]` arrays you can \
+                 `UNNEST` into rows; `ts_query(src, language, query)` runs an arbitrary \
+                 tree-sitter query; and `code_version()` reports the worker version. Table \
+                 functions return result sets: `symbols(src, language)` lists structural \
+                 definitions (functions, methods, classes, structs, enums, interfaces, traits) \
+                 with their line spans, `ts_nodes(src, language, query)` returns one row per \
+                 tree-sitter query match, and `supported_languages()` enumerates every parseable \
+                 language id. Typical uses include codebase metrics dashboards, dependency and \
+                 import auditing, comment and TODO mining, license-header and secret scanning over \
+                 string literals, and structural code search powered by your own tree-sitter \
+                 queries."
                     .to_string(),
             ),
             ("vgi.author".to_string(), "Query.Farm".to_string()),

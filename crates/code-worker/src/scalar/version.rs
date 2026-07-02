@@ -33,6 +33,7 @@ impl ScalarFunction for CodeVersion {
                  gate behavior on a worker version.",
                 "Return the code worker's version string, e.g. `code_version()` \u{2192} `'0.1.0'`.",
                 "version, code_version, build, semantic version, worker version, release",
+                "Language Detection & Discovery",
                 "scalar/version.rs",
             ),
             ..Default::default()

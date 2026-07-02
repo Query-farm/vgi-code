@@ -6,6 +6,7 @@
 //! - `vgi.doc_llm` (VGI112)      — Markdown narrative aimed at LLMs/agents
 //! - `vgi.doc_md` (VGI113)       — Markdown narrative for human docs
 //! - `vgi.keywords` (VGI126)     — search terms/synonyms
+//! - `vgi.category` (VGI413)     — the schema `vgi.categories` bucket it belongs to
 //!
 //! Per-object `vgi.source_url` is intentionally NOT emitted: provenance is
 //! advertised once on the catalog object (its `source_url` field). Repeating it
@@ -39,6 +40,7 @@ pub fn object_tags(
     doc_llm: &str,
     doc_md: &str,
     keywords: &str,
+    category: &str,
     _relative_path: &str,
 ) -> Vec<(String, String)> {
     vec![
@@ -46,5 +48,8 @@ pub fn object_tags(
         ("vgi.doc_llm".to_string(), doc_llm.to_string()),
         ("vgi.doc_md".to_string(), doc_md.to_string()),
         ("vgi.keywords".to_string(), keywords_json(keywords)),
+        // VGI413: name one of the schema's `vgi.categories` so the object is
+        // placed in the worker's navigation/listing sections.
+        ("vgi.category".to_string(), category.to_string()),
     ]
 }

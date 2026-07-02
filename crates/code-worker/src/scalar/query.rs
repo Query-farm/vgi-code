@@ -51,6 +51,7 @@ impl ScalarFunction for TsQuery {
                  `ts_query(src, 'rust', '(function_item name: (identifier) @n)')`.",
                 "tree-sitter, ts_query, query, structural search, capture, ast query, \
                  s-expression, pattern match, syntax tree",
+                "Tree-sitter Queries",
                 "scalar/query.rs",
             ),
             ..Default::default()

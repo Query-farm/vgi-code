@@ -93,21 +93,23 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                  and json. See the official [tree-sitter documentation](https://tree-sitter.github.io/tree-sitter/) \
                  and the [tree-sitter source on GitHub](https://github.com/tree-sitter/tree-sitter) \
                  for grammar and query details.\n\n\
-                 ## Functions and SQL use cases\n\n\
-                 Scalar functions operate per row: `language_of(name)` infers a language from a \
-                 filename; `count_lines(src)`, `loc(src, language)`, and \
-                 `count_functions(src, language)` produce code metrics; `extract_imports`, \
-                 `extract_comments`, and `extract_strings` return `VARCHAR[]` arrays you can \
-                 `UNNEST` into rows; `ts_query(src, language, query)` runs an arbitrary \
-                 tree-sitter query; and `code_version()` reports the worker version. Table \
-                 functions return result sets: `symbols(src, language)` lists structural \
-                 definitions (functions, methods, classes, structs, enums, interfaces, traits) \
-                 with their line spans, `ts_nodes(src, language, query)` returns one row per \
-                 tree-sitter query match, and `supported_languages()` enumerates every parseable \
-                 language id. Typical uses include codebase metrics dashboards, dependency and \
-                 import auditing, comment and TODO mining, license-header and secret scanning over \
-                 string literals, and structural code search powered by your own tree-sitter \
-                 queries."
+                 ## Key concepts\n\n\
+                 Everything is exposed as ordinary SQL: scalar functions take a per-row source \
+                 string (and, where parsing is needed, a `language` id) and return a value or a \
+                 `VARCHAR[]` array; table functions take a constant source and return a result \
+                 set you can join and aggregate. Language ids are lowercase (`rust`, `python`, \
+                 `go`, …) and parsing is best-effort — malformed or truncated input yields empty \
+                 results rather than an error, while an unknown language or a bad tree-sitter \
+                 query is reported clearly. List the schema to discover the exact functions and \
+                 their signatures.\n\n\
+                 ## When to reach for it\n\n\
+                 Use the `code` worker whenever you want to treat source as data instead of text: \
+                 build codebase metrics dashboards (size, complexity, function density), audit \
+                 dependencies and import graphs, mine comments and TODOs, scan string literals \
+                 for secrets, URLs, or missing license headers, and run structural code search \
+                 with your own tree-sitter queries. Because the answers come back as rows, you \
+                 can join them against commits, ownership, issues, or CVE data and compute over \
+                 an entire repository in one query."
                     .to_string(),
             ),
             ("vgi.author".to_string(), "Query.Farm".to_string()),
@@ -123,6 +125,21 @@ fn catalog_metadata(name: &str) -> CatalogModel {
             (
                 "vgi.support_policy_url".to_string(),
                 "https://github.com/Query-farm/vgi-code/blob/main/README.md".to_string(),
+            ),
+            // VGI152: analyst task suite `vgi-lint simulate` runs to measure how
+            // well an agent actually uses this worker. Each task is a natural-
+            // language prompt with the SQL a correct answer should be equivalent to.
+            (
+                "vgi.agent_test_tasks".to_string(),
+                r#"[
+                  {"name":"detect_language","prompt":"Using this worker, what programming language does the file named 'server.py' contain? Return a single value: the detected language id.","reference_sql":"SELECT code.main.language_of('server.py')","ignore_column_names":true},
+                  {"name":"count_functions","prompt":"Using this worker, how many function definitions are in this Rust source string: 'fn a() {} fn b() {} fn c() {}' ? Return the single integer count.","reference_sql":"SELECT code.main.count_functions('fn a() {} fn b() {} fn c() {}', 'rust')","ignore_column_names":true},
+                  {"name":"count_lines","prompt":"Using this worker, how many physical lines are in this source string: 'fn a() {}\nfn b() {}\nfn c() {}\n' ? Return the single integer count.","reference_sql":"SELECT code.main.count_lines('fn a() {}\nfn b() {}\nfn c() {}\n')","ignore_column_names":true},
+                  {"name":"extract_imports","prompt":"Using this worker, extract the import statements from this Python source string: 'import os\nimport sys' . Return one import per row as a single column.","reference_sql":"SELECT UNNEST(code.main.extract_imports('import os\nimport sys', 'python'))","ignore_column_names":true,"unordered":true},
+                  {"name":"list_symbols","prompt":"Using this worker, list the names of the top-level definitions in this Rust source string: 'fn a() {} struct S {}' . Return just the names, one per row.","reference_sql":"SELECT name FROM code.main.symbols('fn a() {} struct S {}', 'rust')","ignore_column_names":true,"unordered":true},
+                  {"name":"supported_languages","prompt":"Using this worker, which programming languages can it parse? Return the language ids, one per row.","reference_sql":"SELECT language FROM code.main.supported_languages","ignore_column_names":true,"unordered":true}
+                ]"#
+                    .to_string(),
             ),
         ],
         source_url: Some("https://github.com/Query-farm/vgi-code".to_string()),
@@ -154,12 +171,22 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                 ),
                 (
                     "vgi.doc_md".to_string(),
-                    "Source-code structure functions over Apache Arrow, powered by tree-sitter. \
-                     Detect a file's language, count physical lines / lines-of-code / function \
-                     definitions, extract imports, comments and string literals as arrays, run \
-                     arbitrary tree-sitter queries (scalar `ts_query` or table `ts_nodes`), and \
-                     list a file's structural symbols. Supports rust, python, javascript, \
-                     typescript, go, java, c, cpp and json."
+                    "# Source-code structure\n\n\
+                     The single schema of the `code` worker. It exposes source-code structure to \
+                     SQL over Apache Arrow, powered by [tree-sitter](https://tree-sitter.github.io/): \
+                     detect a file's language, measure it, and pull structural facts out of it \
+                     without a checkout, language server, or external service.\n\n\
+                     ## What lives here\n\n\
+                     Scalar functions work per row and return a value or a `VARCHAR[]` you can \
+                     `UNNEST`; table functions take a constant source and return joinable result \
+                     sets. The work falls into a few groups — language detection and discovery, \
+                     code metrics, structure and content extraction, and arbitrary tree-sitter \
+                     queries. List the schema to see the exact functions and their signatures.\n\n\
+                     ## Languages\n\n\
+                     Parsing supports rust, python, javascript, typescript, go, java, c, cpp and \
+                     json. Language ids are lowercase; malformed or truncated input yields empty \
+                     results rather than an error, while an unknown language or a bad query is \
+                     reported clearly."
                         .to_string(),
                 ),
                 // VGI506 representative example queries for the schema.
@@ -172,6 +199,14 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                      SELECT code.main.extract_imports('import os\nimport sys\n', 'python');\n\
                      SELECT * FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust');\n\
                      SELECT * FROM code.main.supported_languages();"
+                        .to_string(),
+                ),
+                // VGI413: ordered category registry. Every function/table declares
+                // a matching `vgi.category`; these drive the worker's navigation,
+                // listing sections and SEO descriptions.
+                (
+                    "vgi.categories".to_string(),
+                    r#"[{"name":"Language Detection & Discovery","description":"Identify a source file's programming language, list the languages this worker can parse, and report the worker version."},{"name":"Code Metrics","description":"Quantify source: physical line counts, lines-of-code, and function-definition counts."},{"name":"Structure & Extraction","description":"Pull structural facts out of source — symbols (functions, classes, structs, …), imports, comments, and string literals."},{"name":"Tree-sitter Queries","description":"Run arbitrary tree-sitter queries over source and return the matches as scalar arrays or rows."}]"#
                         .to_string(),
                 ),
             ],
@@ -235,6 +270,11 @@ fn supported_languages_table() -> CatTable {
         ("domain".to_string(), "software-engineering".to_string()),
         ("category".to_string(), "code-analysis".to_string()),
         ("topic".to_string(), "source-structure".to_string()),
+        // VGI411/VGI413: place this table in one of the schema's `vgi.categories`.
+        (
+            "vgi.category".to_string(),
+            "Language Detection & Discovery".to_string(),
+        ),
         // VGI501 example queries for the table.
         (
             "vgi.example_queries".to_string(),

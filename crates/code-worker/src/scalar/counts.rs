@@ -44,11 +44,14 @@ impl ScalarFunction for CountLines {
             tags: crate::meta::object_tags(
                 "Count Physical Lines",
                 "Count the total number of physical lines in a source string, including blank \
-                 and comment lines. Language-agnostic (no parsing). Returns NULL when the source \
-                 is NULL. Use it for raw file-size / line-count metrics.",
+                 and comment lines. Language-agnostic (no parsing). A single trailing newline is \
+                 NOT counted as an extra line, so 'a\\nb\\n' and 'a\\nb' both report 2; an empty \
+                 string reports 0. Returns NULL when the source is NULL. Use it for raw file-size \
+                 / line-count metrics.",
                 "Total physical lines in the source, e.g. \
                  `count_lines('a\\nb\\n')` \u{2192} `2`. NULL in \u{2192} NULL.",
                 "count lines, line count, physical lines, total lines, file size, metrics, wc -l",
+                "Code Metrics",
                 "scalar/counts.rs",
             ),
             ..Default::default()
@@ -112,6 +115,7 @@ impl ScalarFunction for Loc {
                  `loc(src, 'rust')`. NULL in \u{2192} NULL; unknown language errors.",
                 "lines of code, loc, sloc, code metrics, non-comment lines, effective lines, \
                  source lines",
+                "Code Metrics",
                 "scalar/counts.rs",
             ),
             ..Default::default()
@@ -191,6 +195,7 @@ impl ScalarFunction for CountFunctions {
                  `count_functions(src, 'python')` \u{2192} `2`.",
                 "count functions, function count, number of functions, methods, definitions, \
                  code metrics, complexity",
+                "Code Metrics",
                 "scalar/counts.rs",
             ),
             ..Default::default()

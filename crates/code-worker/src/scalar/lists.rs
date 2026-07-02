@@ -130,6 +130,7 @@ impl ScalarFunction for ExtractList {
                 self.llm_desc,
                 self.md_desc,
                 self.keywords,
+                "Structure & Extraction",
                 "scalar/lists.rs",
             ),
             ..Default::default()

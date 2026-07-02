@@ -50,6 +50,7 @@ impl TableFunction for Symbols {
              e.g. `symbols('fn a() {}', 'rust')`.",
             "symbols, outline, definitions, functions, classes, methods, structs, enums, traits, \
              interfaces, code index, navigation, table of contents",
+            "Structure & Extraction",
             "table/symbols.rs",
         );
         tags.push((

@@ -93,6 +93,7 @@ impl TableFunction for SupportedLanguages {
             "List the language ids this worker can parse. Column: `language`.",
             "supported languages, list languages, available languages, language ids, discovery, \
              what languages, grammars",
+            "Language Detection & Discovery",
             "table/supported_languages.rs",
         );
         tags.push((

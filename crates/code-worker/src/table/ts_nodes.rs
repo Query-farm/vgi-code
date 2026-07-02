@@ -50,6 +50,7 @@ impl TableFunction for TsNodes {
              e.g. `ts_nodes(src, 'rust', '(function_item) @f')`.",
             "tree-sitter, ts_nodes, query, captures, structural search, ast, nodes, \
              s-expression, syntax tree, extraction",
+            "Tree-sitter Queries",
             "table/ts_nodes.rs",
         );
         tags.push((

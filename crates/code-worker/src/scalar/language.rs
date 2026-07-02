@@ -43,6 +43,7 @@ impl ScalarFunction for LanguageOf {
                  `language_of('main.rs')` \u{2192} `'rust'`. NULL if unknown.",
                 "language detection, language_of, detect language, file extension, file type, \
                  guess language, rust, python, javascript, typescript, go, java, c, cpp, json",
+                "Language Detection & Discovery",
                 "scalar/language.rs",
             ),
             ..Default::default()

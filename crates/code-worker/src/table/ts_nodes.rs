@@ -53,16 +53,19 @@ impl TableFunction for TsNodes {
             "Tree-sitter Queries",
             "table/ts_nodes.rs",
         );
+        // VGI307/VGI321: static result schema as structured JSON {name,type,description}.
+        // Types match `output_schema()` exactly (Int64→BIGINT, Utf8→VARCHAR,
+        // Int32→INTEGER) so VGI910 (schema matches the returned columns) holds.
         tags.push((
-            "vgi.result_columns_md".into(),
-            "| column | type | description |\n\
-             |---|---|---|\n\
-             | `seq` | BIGINT | 0-based capture index in document order. |\n\
-             | `capture` | VARCHAR | The query capture name (the `@name` in the query). |\n\
-             | `text` | VARCHAR | The captured node's source text. |\n\
-             | `start_line` | INTEGER | 1-based line where the captured node starts. |\n\
-             | `end_line` | INTEGER | 1-based line where the captured node ends. |"
-                .into(),
+            "vgi.result_columns_schema".into(),
+            r#"[
+  {"name":"seq","type":"BIGINT","description":"0-based capture index in document order."},
+  {"name":"capture","type":"VARCHAR","description":"The query capture name (the @name in the tree-sitter query)."},
+  {"name":"text","type":"VARCHAR","description":"The captured node's source text."},
+  {"name":"start_line","type":"INTEGER","description":"1-based line where the captured node starts."},
+  {"name":"end_line","type":"INTEGER","description":"1-based line where the captured node ends."}
+]"#
+            .into(),
         ));
         FunctionMetadata {
             description:
@@ -89,7 +92,8 @@ impl TableFunction for TsNodes {
                 "The language id selecting the parser grammar, e.g. 'rust', \
                  'python', 'go'; must be one of supported_languages() \
                  (a bind-time constant).",
-            ),
+            )
+            .with_choices(parsing::SUPPORTED.iter().copied()),
             ArgSpec::const_arg(
                 "query",
                 2,

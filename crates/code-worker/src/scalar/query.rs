@@ -73,7 +73,8 @@ impl ScalarFunction for TsQuery {
                 "varchar",
                 "The language id selecting the parser grammar, e.g. 'rust', \
                  'python', 'go'; must be one of supported_languages().",
-            ),
+            )
+            .with_choices(parsing::SUPPORTED.iter().copied()),
             ArgSpec::column(
                 "query",
                 2,

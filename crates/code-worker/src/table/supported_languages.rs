@@ -96,13 +96,15 @@ impl TableFunction for SupportedLanguages {
             "Language Detection & Discovery",
             "table/supported_languages.rs",
         );
+        // VGI307/VGI321/VGI324: static result schema as structured JSON. The single
+        // `language` VARCHAR column matches both `output_schema()` and the backing
+        // `supported_languages` table.
         tags.push((
-            "vgi.result_columns_md".into(),
-            "| column | type | description |\n\
-             |---|---|---|\n\
-             | `language` | VARCHAR | A language id accepted by the other functions, e.g. \
-             `rust`, `python`, `go`. |"
-                .into(),
+            "vgi.result_columns_schema".into(),
+            r#"[
+  {"name":"language","type":"VARCHAR","description":"A language id accepted by the other functions, e.g. rust, python, go."}
+]"#
+            .into(),
         ));
         tags.push(("vgi.executable_examples".into(), EXECUTABLE_EXAMPLES.into()));
         FunctionMetadata {

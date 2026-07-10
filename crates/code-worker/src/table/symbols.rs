@@ -53,16 +53,18 @@ impl TableFunction for Symbols {
             "Structure & Extraction",
             "table/symbols.rs",
         );
+        // VGI307/VGI321: static result schema as structured JSON {name,type,description}.
+        // Types match `output_schema()` exactly (Utf8→VARCHAR, Int32→INTEGER) so
+        // VGI910 (schema matches what the function returns under --execute) holds.
         tags.push((
-            "vgi.result_columns_md".into(),
-            "| column | type | description |\n\
-             |---|---|---|\n\
-             | `kind` | VARCHAR | Symbol kind: `function`, `method`, `class`, `struct`, \
-             `enum`, `interface`, `trait`. |\n\
-             | `name` | VARCHAR | The symbol's identifier (NULL when anonymous). |\n\
-             | `start_line` | INTEGER | 1-based line where the definition starts. |\n\
-             | `end_line` | INTEGER | 1-based line where the definition ends. |"
-                .into(),
+            "vgi.result_columns_schema".into(),
+            r#"[
+  {"name":"kind","type":"VARCHAR","description":"Symbol kind: one of function, method, class, struct, enum, interface, or trait."},
+  {"name":"name","type":"VARCHAR","description":"The symbol's identifier (NULL when the definition is anonymous)."},
+  {"name":"start_line","type":"INTEGER","description":"1-based line where the definition starts."},
+  {"name":"end_line","type":"INTEGER","description":"1-based line where the definition ends."}
+]"#
+            .into(),
         ));
         FunctionMetadata {
             description:
@@ -89,7 +91,8 @@ impl TableFunction for Symbols {
                 "The language id selecting the parser grammar, e.g. 'rust', \
                  'python', 'go'; must be one of supported_languages() \
                  (a bind-time constant).",
-            ),
+            )
+            .with_choices(parsing::SUPPORTED.iter().copied()),
         ]
     }
 

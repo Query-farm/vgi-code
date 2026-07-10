@@ -137,7 +137,8 @@ impl ScalarFunction for Loc {
                 "varchar",
                 "The language id selecting the parser grammar, e.g. 'rust', \
                  'python', 'go'; must be one of supported_languages().",
-            ),
+            )
+            .with_choices(parsing::SUPPORTED.iter().copied()),
         ]
     }
 
@@ -217,7 +218,8 @@ impl ScalarFunction for CountFunctions {
                 "varchar",
                 "The language id selecting the parser grammar, e.g. 'rust', \
                  'python', 'go'; must be one of supported_languages().",
-            ),
+            )
+            .with_choices(parsing::SUPPORTED.iter().copied()),
         ]
     }
 

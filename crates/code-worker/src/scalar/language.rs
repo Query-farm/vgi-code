@@ -23,29 +23,36 @@ impl ScalarFunction for LanguageOf {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        const EXAMPLE_SQL: &str = "SELECT code.main.language_of('src/main.rs');";
+        const EXAMPLE_DESC: &str =
+            "Detect the source language of a file from its extension (\u{2192} 'rust').";
+        let mut tags = crate::meta::object_tags(
+            "Detect Source Language",
+            "Infer the programming language of a file from its name or path extension, e.g. \
+             'src/main.rs' \u{2192} 'rust', 'app.py' \u{2192} 'python'. Returns NULL when the \
+             filename is NULL or its extension maps to no supported language. Use it to route \
+             files to the right language id for the other functions.",
+            "Infer a file's language from its extension, e.g. \
+             `language_of('main.rs')` \u{2192} `'rust'`. NULL if unknown.",
+            "language detection, language_of, detect language, file extension, file type, \
+             guess language, rust, python, javascript, typescript, go, java, c, cpp, json",
+            "Language Detection & Discovery",
+            "scalar/language.rs",
+        );
+        tags.push(crate::meta::example_queries_tag(&[(
+            EXAMPLE_DESC,
+            EXAMPLE_SQL,
+        )]));
         FunctionMetadata {
             description: "Infer the source language from a filename's extension (NULL if unknown)"
                 .into(),
             return_type: Some(DataType::Utf8),
             examples: vec![FunctionExample {
-                sql: "SELECT code.main.language_of('src/main.rs');".into(),
-                description: "Detect the source language of a file from its extension (→ 'rust')."
-                    .into(),
+                sql: EXAMPLE_SQL.into(),
+                description: EXAMPLE_DESC.into(),
                 expected_output: None,
             }],
-            tags: crate::meta::object_tags(
-                "Detect Source Language",
-                "Infer the programming language of a file from its name or path extension, e.g. \
-                 'src/main.rs' \u{2192} 'rust', 'app.py' \u{2192} 'python'. Returns NULL when the \
-                 filename is NULL or its extension maps to no supported language. Use it to route \
-                 files to the right language id for the other functions.",
-                "Infer a file's language from its extension, e.g. \
-                 `language_of('main.rs')` \u{2192} `'rust'`. NULL if unknown.",
-                "language detection, language_of, detect language, file extension, file type, \
-                 guess language, rust, python, javascript, typescript, go, java, c, cpp, json",
-                "Language Detection & Discovery",
-                "scalar/language.rs",
-            ),
+            tags,
             ..Default::default()
         }
     }

@@ -28,6 +28,46 @@ fn keywords_json(keywords: &str) -> String {
     format!("[{}]", items.join(","))
 }
 
+/// JSON-escape a single string value (quotes, backslashes, control chars) so it
+/// can be embedded in a JSON string literal.
+fn json_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 2);
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out
+}
+
+/// Build a `vgi.example_queries` tag from `(description, sql)` pairs as the
+/// described-example JSON list `[{"description":…,"sql":…}]` the linter requires
+/// (VGI515). The native `FunctionExample` carrier surfaced via
+/// `duckdb_functions().examples` drops the per-example description, so every
+/// function also publishes its examples through this tag, which preserves them.
+pub fn example_queries_tag(examples: &[(&str, &str)]) -> (String, String) {
+    let items: Vec<String> = examples
+        .iter()
+        .map(|(desc, sql)| {
+            format!(
+                r#"{{"description":"{}","sql":"{}"}}"#,
+                json_escape(desc),
+                json_escape(sql)
+            )
+        })
+        .collect();
+    (
+        "vgi.example_queries".to_string(),
+        format!("[{}]", items.join(",")),
+    )
+}
+
 /// Build the standard per-object discovery/description tags.
 ///
 /// `keywords` is given comma-separated and serialized to the `vgi.keywords`

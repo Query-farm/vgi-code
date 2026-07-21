@@ -63,7 +63,7 @@ impl ExtractList {
             title: "Extract Import Statements",
             llm_desc:
                 "Extract the import / use / require statements from a source string for a given \
-                 language, returned as a VARCHAR[] of the statement texts. NULL source or \
+                 language, returned as a `VARCHAR[]` of the statement texts. NULL source or \
                  language \u{2192} NULL list; an empty source \u{2192} empty list; an unknown \
                  language is a clear error. Use it to discover a file's dependencies.",
             md_desc: "Import/use/require statements as a `VARCHAR[]`, e.g. \
@@ -82,7 +82,7 @@ impl ExtractList {
             title: "Extract Comment Texts",
             llm_desc:
                 "Extract the comment texts (line and block comments) from a source string for a \
-                 given language, returned as a VARCHAR[]. NULL source or language \u{2192} NULL \
+                 given language, returned as a `VARCHAR[]`. NULL source or language \u{2192} NULL \
                  list; empty source \u{2192} empty list; an unknown language is a clear error. \
                  Use it to mine documentation, TODOs, or license headers.",
             md_desc: "Comment texts as a `VARCHAR[]`, e.g. `extract_comments(src, 'rust')`.",
@@ -100,7 +100,7 @@ impl ExtractList {
             title: "Extract String Literals",
             llm_desc:
                 "Extract the string-literal texts from a source string for a given language, \
-                 returned as a VARCHAR[] (the literals including their quotes). NULL source or \
+                 returned as a `VARCHAR[]` (the literals including their quotes). NULL source or \
                  language \u{2192} NULL list; empty source \u{2192} empty list; an unknown \
                  language is a clear error. Use it to find hard-coded strings, secrets, or URLs.",
             md_desc: "String-literal texts as a `VARCHAR[]`, e.g. `extract_strings(src, 'rust')`.",
@@ -117,6 +117,18 @@ impl ScalarFunction for ExtractList {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        let mut tags = crate::meta::object_tags(
+            self.title,
+            self.llm_desc,
+            self.md_desc,
+            self.keywords,
+            "Structure & Extraction",
+            "scalar/lists.rs",
+        );
+        tags.push(crate::meta::example_queries_tag(&[(
+            self.example_desc,
+            self.example_sql,
+        )]));
         FunctionMetadata {
             description: self.desc.into(),
             return_type: Some(list_varchar_type()),
@@ -125,14 +137,7 @@ impl ScalarFunction for ExtractList {
                 description: self.example_desc.into(),
                 expected_output: None,
             }],
-            tags: crate::meta::object_tags(
-                self.title,
-                self.llm_desc,
-                self.md_desc,
-                self.keywords,
-                "Structure & Extraction",
-                "scalar/lists.rs",
-            ),
+            tags,
             ..Default::default()
         }
     }

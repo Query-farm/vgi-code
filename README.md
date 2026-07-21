@@ -67,7 +67,6 @@ SELECT * FROM supported_languages();
 | `extract_comments(source, language)` | `VARCHAR[]` | Comment texts. |
 | `extract_strings(source, language)` | `VARCHAR[]` | String-literal texts. |
 | `ts_query(source, language, query)` | `VARCHAR[]` | Captured node texts of a tree-sitter query. |
-| `code_version()` | `VARCHAR` | Worker version string. |
 
 ### Table (constant arguments, passed positionally)
 

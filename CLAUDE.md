@@ -105,7 +105,9 @@ CI (`.github/workflows/ci.yml`) runs fmt/clippy/build/test plus a gated
 ## Function surface
 
 Scalars: `language_of`, `count_lines`, `loc`, `count_functions`,
-`extract_imports`, `extract_comments`, `extract_strings`, `ts_query`,
-`code_version`. Tables: `symbols`, `ts_nodes`, `supported_languages`. Garbage /
+`extract_imports`, `extract_comments`, `extract_strings`, `ts_query`.
+Tables: `symbols`, `ts_nodes`, `supported_languages`. The build version is
+published as the catalog `implementation_version` (read via `vgi_catalogs()`),
+not a scalar. Garbage /
 empty / oversized source → graceful empty / NULL / no rows; an unknown language
 or malformed query is a clear error.

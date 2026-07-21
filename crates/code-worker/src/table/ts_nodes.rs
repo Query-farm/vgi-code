@@ -67,6 +67,16 @@ impl TableFunction for TsNodes {
 ]"#
             .into(),
         ));
+        tags.push(crate::meta::example_queries_tag(&[
+            (
+                "Return each tree-sitter capture's name and text in document order.",
+                "SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq",
+            ),
+            (
+                "Return just the captured node texts and their line spans.",
+                "SELECT text, start_line FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq",
+            ),
+        ]));
         FunctionMetadata {
             description:
                 "Tree-sitter query matches over a source doc as (seq, capture, text, start_line, end_line) rows"

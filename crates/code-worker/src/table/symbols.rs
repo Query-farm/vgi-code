@@ -66,6 +66,16 @@ impl TableFunction for Symbols {
 ]"#
             .into(),
         ));
+        tags.push(crate::meta::example_queries_tag(&[
+            (
+                "List the function symbols and their line spans in a Rust source string.",
+                "SELECT name, start_line, end_line FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust') WHERE kind = 'function' ORDER BY start_line",
+            ),
+            (
+                "Count the defined symbols by kind in a Python source string.",
+                "SELECT kind, count(*) AS n FROM code.main.symbols('class C:\n    def m(self): pass\ndef f(): pass\n', 'python') GROUP BY kind ORDER BY kind",
+            ),
+        ]));
         FunctionMetadata {
             description:
                 "Structural symbols (functions, classes, methods, structs, enums, …) of a source doc"

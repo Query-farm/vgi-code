@@ -31,7 +31,7 @@ use std::sync::Arc;
 use vgi::catalog::{CatSchema, CatTable, CatalogModel};
 use vgi::Worker;
 
-/// Worker version string, surfaced by `code_version()`.
+/// Worker version string, published as the catalog `implementation_version`.
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
@@ -100,8 +100,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                  set you can join and aggregate. Language ids are lowercase (`rust`, `python`, \
                  `go`, …) and parsing is best-effort — malformed or truncated input yields empty \
                  results rather than an error, while an unknown language or a bad tree-sitter \
-                 query is reported clearly. List the schema to discover the exact functions and \
-                 their signatures.\n\n\
+                 query is reported clearly.\n\n\
                  ## When to reach for it\n\n\
                  Use the `code` worker whenever you want to treat source as data instead of text: \
                  build codebase metrics dashboards (size, complexity, function density), audit \
@@ -142,13 +141,16 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                   {"name":"extract_comments","prompt":"Using this worker, extract the comment texts from this Rust source string: '// header\nfn a() {}\n' . Return one comment per row.","reference_sql":"SELECT UNNEST(code.main.extract_comments('// header\nfn a() {}\n', 'rust'))","ignore_column_names":true,"unordered":true},
                   {"name":"extract_strings","prompt":"Using this worker, extract the string literals from this Rust source string: 'let s = \"hello\";\n' . Return one string literal per row (each with its surrounding quotes).","reference_sql":"SELECT UNNEST(code.main.extract_strings('let s = \"hello\";\n', 'rust'))","ignore_column_names":true,"unordered":true},
                   {"name":"ts_query_names","prompt":"Using this worker, run the tree-sitter query '(function_item name: (identifier) @n)' over this Rust source string: 'fn alpha() {}\nfn beta() {}\n' and return each captured node's text, one per row.","reference_sql":"SELECT UNNEST(code.main.ts_query('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)'))","ignore_column_names":true,"unordered":true},
-                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row.","reference_sql":"SELECT text FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq","ignore_column_names":true},
-                  {"name":"worker_version_present","prompt":"Using this worker, confirm it can report its own version. Return a single boolean value that is true when the worker's version string is present and non-empty.","reference_sql":"SELECT length(code.main.code_version()) > 0","ignore_column_names":true}
+                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row.","reference_sql":"SELECT text FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq","ignore_column_names":true}
                 ]"#
                     .to_string(),
             ),
         ],
         source_url: Some("https://github.com/Query-farm/vgi-code".to_string()),
+        // VGI328: publish the build version as catalog metadata (read from
+        // vgi_catalogs() without spending a query) instead of a parameterless
+        // code_version() scalar.
+        implementation_version: Some(version().to_string()),
         schemas: vec![CatSchema {
             name: "main".to_string(),
             comment: Some(
@@ -187,7 +189,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                      `UNNEST`; table functions take a constant source and return joinable result \
                      sets. The work falls into a few groups — language detection and discovery, \
                      code metrics, structure and content extraction, and arbitrary tree-sitter \
-                     queries. List the schema to see the exact functions and their signatures.\n\n\
+                     queries.\n\n\
                      ## Languages\n\n\
                      Parsing supports rust, python, javascript, typescript, go, java, c, cpp and \
                      json. Language ids are lowercase; malformed or truncated input yields empty \
@@ -195,16 +197,19 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                      reported clearly."
                         .to_string(),
                 ),
-                // VGI506 representative example queries for the schema.
+                // VGI506/VGI515 representative example queries for the schema, as a
+                // JSON list of {description, sql} so every example carries a
+                // human-readable description (the native examples carrier drops it).
                 (
                     "vgi.example_queries".to_string(),
-                    "SELECT code.main.language_of('src/main.rs');\n\
-                     SELECT code.main.count_lines('fn a() {}\nfn b() {}\n');\n\
-                     SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust');\n\
-                     SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python');\n\
-                     SELECT code.main.extract_imports('import os\nimport sys\n', 'python');\n\
-                     SELECT * FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust');\n\
-                     SELECT * FROM code.main.supported_languages();"
+                    r#"[
+                      {"description":"Detect a file's language from its extension.","sql":"SELECT code.main.language_of('src/main.rs')"},
+                      {"description":"Count the lines of code (excluding blank and comment lines) in a Rust source string.","sql":"SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust')"},
+                      {"description":"Count the function definitions in a Python source string.","sql":"SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python')"},
+                      {"description":"Extract each Python import statement, one per row.","sql":"SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python')) AS import"},
+                      {"description":"List the function symbols and their line spans in a Rust source string.","sql":"SELECT name, start_line, end_line FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust') WHERE kind = 'function'"},
+                      {"description":"List every language id the worker can parse.","sql":"SELECT language FROM code.main.supported_languages ORDER BY language"}
+                    ]"#
                         .to_string(),
                 ),
                 // VGI413: ordered category registry. Every function/table declares
@@ -212,7 +217,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                 // listing sections and SEO descriptions.
                 (
                     "vgi.categories".to_string(),
-                    r#"[{"name":"Language Detection & Discovery","description":"Identify a source file's programming language, list the languages this worker can parse, and report the worker version."},{"name":"Code Metrics","description":"Quantify source: physical line counts, lines-of-code, and function-definition counts."},{"name":"Structure & Extraction","description":"Pull structural facts out of source — symbols (functions, classes, structs, …), imports, comments, and string literals."},{"name":"Tree-sitter Queries","description":"Run arbitrary tree-sitter queries over source and return the matches as scalar arrays or rows."}]"#
+                    r#"[{"name":"Language Detection & Discovery","description":"Identify a source file's programming language and list the languages this worker can parse."},{"name":"Code Metrics","description":"Quantify source: physical line counts, lines-of-code, and function-definition counts."},{"name":"Structure & Extraction","description":"Pull structural facts out of source — symbols (functions, classes, structs, …), imports, comments, and string literals."},{"name":"Tree-sitter Queries","description":"Run arbitrary tree-sitter queries over source and return the matches as scalar arrays or rows."}]"#
                         .to_string(),
                 ),
             ],

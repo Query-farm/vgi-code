@@ -9,13 +9,11 @@ mod counts;
 mod language;
 mod lists;
 mod query;
-mod version;
 
 use vgi::Worker;
 
 /// Register every scalar function on the worker.
 pub fn register(worker: &mut Worker) {
-    worker.register_scalar(version::CodeVersion);
     worker.register_scalar(language::LanguageOf);
     worker.register_scalar(counts::CountLines);
     worker.register_scalar(counts::Loc);

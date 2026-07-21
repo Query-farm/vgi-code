@@ -50,8 +50,8 @@ const EXECUTABLE_EXAMPLES: &str = r#"[
     "sql": "SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq"
   },
   {
-    "description": "Report the running code worker's version.",
-    "sql": "SELECT code.main.code_version() AS version"
+    "description": "Extract the comment texts from a Rust source string.",
+    "sql": "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust') AS comments"
   }
 ]"#;
 

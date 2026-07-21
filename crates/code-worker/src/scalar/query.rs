@@ -27,33 +27,38 @@ impl ScalarFunction for TsQuery {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        const EXAMPLE_SQL: &str = "SELECT code.main.ts_query('fn alpha() {}\nfn beta() {}\n', \
+             'rust', '(function_item name: (identifier) @n)');";
+        const EXAMPLE_DESC: &str =
+            "Run a tree-sitter query and return captured node texts (here, the two function names).";
+        let mut tags = crate::meta::object_tags(
+            "Run Tree-Sitter Query",
+            "Run an arbitrary tree-sitter S-expression query over a source string for a \
+             given language and return every captured node's text as a `VARCHAR[]`. The power \
+             feature for ad-hoc structural search. NULL source/language/query \u{2192} NULL \
+             list; an unknown language or a malformed query is a clear error.",
+            "Run a tree-sitter query and return captured node texts as a `VARCHAR[]`, e.g. \
+             `ts_query(src, 'rust', '(function_item name: (identifier) @n)')`.",
+            "tree-sitter, ts_query, query, structural search, capture, ast query, \
+             s-expression, pattern match, syntax tree",
+            "Tree-sitter Queries",
+            "scalar/query.rs",
+        );
+        tags.push(crate::meta::example_queries_tag(&[(
+            EXAMPLE_DESC,
+            EXAMPLE_SQL,
+        )]));
         FunctionMetadata {
             description:
-                "Run a tree-sitter query over the source and return the captured node texts (VARCHAR[])"
+                "Run a tree-sitter query over the source and return the captured node texts (`VARCHAR[]`)"
                     .into(),
             return_type: Some(list_varchar_type()),
             examples: vec![FunctionExample {
-                sql: "SELECT code.main.ts_query('fn alpha() {}\nfn beta() {}\n', 'rust', \
-                      '(function_item name: (identifier) @n)');"
-                    .into(),
-                description: "Run a tree-sitter query and return captured node texts \
-                              (here, the two function names)."
-                    .into(),
+                sql: EXAMPLE_SQL.into(),
+                description: EXAMPLE_DESC.into(),
                 expected_output: None,
             }],
-            tags: crate::meta::object_tags(
-                "Run Tree-Sitter Query",
-                "Run an arbitrary tree-sitter S-expression query over a source string for a \
-                 given language and return every captured node's text as a VARCHAR[]. The power \
-                 feature for ad-hoc structural search. NULL source/language/query \u{2192} NULL \
-                 list; an unknown language or a malformed query is a clear error.",
-                "Run a tree-sitter query and return captured node texts as a `VARCHAR[]`, e.g. \
-                 `ts_query(src, 'rust', '(function_item name: (identifier) @n)')`.",
-                "tree-sitter, ts_query, query, structural search, capture, ast query, \
-                 s-expression, pattern match, syntax tree",
-                "Tree-sitter Queries",
-                "scalar/query.rs",
-            ),
+            tags,
             ..Default::default()
         }
     }

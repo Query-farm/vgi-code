@@ -33,27 +33,34 @@ impl ScalarFunction for CountLines {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        const EXAMPLE_SQL: &str = "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n');";
+        const EXAMPLE_DESC: &str = "Count the physical lines in a source string (\u{2192} 2).";
+        let mut tags = crate::meta::object_tags(
+            "Count Physical Lines",
+            "Count the total number of physical lines in a source string, including blank \
+             and comment lines. Language-agnostic (no parsing). A single trailing newline is \
+             NOT counted as an extra line, so 'a\\nb\\n' and 'a\\nb' both report 2; an empty \
+             string reports 0. Returns NULL when the source is NULL. Use it for raw file-size \
+             / line-count metrics.",
+            "Total physical lines in the source, e.g. \
+             `count_lines('a\\nb\\n')` \u{2192} `2`. NULL in \u{2192} NULL.",
+            "count lines, line count, physical lines, total lines, file size, metrics, wc -l",
+            "Code Metrics",
+            "scalar/counts.rs",
+        );
+        tags.push(crate::meta::example_queries_tag(&[(
+            EXAMPLE_DESC,
+            EXAMPLE_SQL,
+        )]));
         FunctionMetadata {
-            description: "Total number of physical lines in the source (NULL → NULL)".into(),
+            description: "Total number of physical lines in the source (NULL \u{2192} NULL)".into(),
             return_type: Some(DataType::Int32),
             examples: vec![FunctionExample {
-                sql: "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n');".into(),
-                description: "Count the physical lines in a source string (→ 2).".into(),
+                sql: EXAMPLE_SQL.into(),
+                description: EXAMPLE_DESC.into(),
                 expected_output: None,
             }],
-            tags: crate::meta::object_tags(
-                "Count Physical Lines",
-                "Count the total number of physical lines in a source string, including blank \
-                 and comment lines. Language-agnostic (no parsing). A single trailing newline is \
-                 NOT counted as an extra line, so 'a\\nb\\n' and 'a\\nb' both report 2; an empty \
-                 string reports 0. Returns NULL when the source is NULL. Use it for raw file-size \
-                 / line-count metrics.",
-                "Total physical lines in the source, e.g. \
-                 `count_lines('a\\nb\\n')` \u{2192} `2`. NULL in \u{2192} NULL.",
-                "count lines, line count, physical lines, total lines, file size, metrics, wc -l",
-                "Code Metrics",
-                "scalar/counts.rs",
-            ),
+            tags,
             ..Default::default()
         }
     }
@@ -96,28 +103,37 @@ impl ScalarFunction for Loc {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        const EXAMPLE_SQL: &str =
+            "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust');";
+        const EXAMPLE_DESC: &str =
+            "Count lines of code, excluding blank and comment lines (\u{2192} 2).";
+        let mut tags = crate::meta::object_tags(
+            "Lines Of Code",
+            "Count the lines of code (LOC) in a source string for a given language: physical \
+             lines that are neither blank nor purely comments. Returns NULL when the source \
+             or language is NULL; an unknown language id is a clear error. Use it for code-\
+             size metrics that ignore whitespace and comments.",
+            "Non-blank, non-comment lines for a language, e.g. \
+             `loc(src, 'rust')`. NULL in \u{2192} NULL; unknown language errors.",
+            "lines of code, loc, sloc, code metrics, non-comment lines, effective lines, \
+             source lines",
+            "Code Metrics",
+            "scalar/counts.rs",
+        );
+        tags.push(crate::meta::example_queries_tag(&[(
+            EXAMPLE_DESC,
+            EXAMPLE_SQL,
+        )]));
         FunctionMetadata {
             description: "Lines of code: non-blank, non-comment lines for the given language"
                 .into(),
             return_type: Some(DataType::Int32),
             examples: vec![FunctionExample {
-                sql: "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust');".into(),
-                description: "Count lines of code, excluding blank and comment lines (→ 2).".into(),
+                sql: EXAMPLE_SQL.into(),
+                description: EXAMPLE_DESC.into(),
                 expected_output: None,
             }],
-            tags: crate::meta::object_tags(
-                "Lines Of Code",
-                "Count the lines of code (LOC) in a source string for a given language: physical \
-                 lines that are neither blank nor purely comments. Returns NULL when the source \
-                 or language is NULL; an unknown language id is a clear error. Use it for code-\
-                 size metrics that ignore whitespace and comments.",
-                "Non-blank, non-comment lines for a language, e.g. \
-                 `loc(src, 'rust')`. NULL in \u{2192} NULL; unknown language errors.",
-                "lines of code, loc, sloc, code metrics, non-comment lines, effective lines, \
-                 source lines",
-                "Code Metrics",
-                "scalar/counts.rs",
-            ),
+            tags,
             ..Default::default()
         }
     }
@@ -176,29 +192,35 @@ impl ScalarFunction for CountFunctions {
     }
 
     fn metadata(&self) -> FunctionMetadata {
+        const EXAMPLE_SQL: &str =
+            "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python');";
+        const EXAMPLE_DESC: &str = "Count function/method definitions in the source (\u{2192} 2).";
+        let mut tags = crate::meta::object_tags(
+            "Count Function Definitions",
+            "Count the function and method definitions in a source string for a given \
+             language, using tree-sitter to find definition nodes. Returns NULL when the \
+             source or language is NULL; an unknown language id is a clear error. Use it as a \
+             quick structural metric of how many functions a file defines.",
+            "Number of function/method definitions for a language, e.g. \
+             `count_functions(src, 'python')` \u{2192} `2`.",
+            "count functions, function count, number of functions, methods, definitions, \
+             code metrics, complexity",
+            "Code Metrics",
+            "scalar/counts.rs",
+        );
+        tags.push(crate::meta::example_queries_tag(&[(
+            EXAMPLE_DESC,
+            EXAMPLE_SQL,
+        )]));
         FunctionMetadata {
             description: "Number of function/method definitions for the given language".into(),
             return_type: Some(DataType::Int32),
             examples: vec![FunctionExample {
-                sql:
-                    "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python');"
-                        .into(),
-                description: "Count function/method definitions in the source (→ 2).".into(),
+                sql: EXAMPLE_SQL.into(),
+                description: EXAMPLE_DESC.into(),
                 expected_output: None,
             }],
-            tags: crate::meta::object_tags(
-                "Count Function Definitions",
-                "Count the function and method definitions in a source string for a given \
-                 language, using tree-sitter to find definition nodes. Returns NULL when the \
-                 source or language is NULL; an unknown language id is a clear error. Use it as a \
-                 quick structural metric of how many functions a file defines.",
-                "Number of function/method definitions for a language, e.g. \
-                 `count_functions(src, 'python')` \u{2192} `2`.",
-                "count functions, function count, number of functions, methods, definitions, \
-                 code metrics, complexity",
-                "Code Metrics",
-                "scalar/counts.rs",
-            ),
+            tags,
             ..Default::default()
         }
     }

@@ -289,7 +289,7 @@ pub fn run_query(lang: Lang, source: &str, query: &str) -> Result<Vec<Capture>, 
     let mut out = Vec::new();
     let mut matches = cursor.matches(&q, tree.root_node(), bytes);
     while let Some(m) = matches.next() {
-        for cap in m.captures {
+        for cap in m.captures() {
             let node = cap.node;
             let text = node.utf8_text(bytes).unwrap_or("").to_string();
             out.push(Capture {

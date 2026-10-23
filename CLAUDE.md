@@ -51,14 +51,13 @@ Per-language tree-sitter **queries** drive every extraction:
    are at *divergent* versions (rust 0.24, python/js/go 0.25, ts/java/cpp 0.23,
    c/json 0.24), yet they all link against **one** `tree-sitter` core. This works
    because every grammar — and the core — depends only on the ABI-stable
-   `tree-sitter-language ^0.1` shim (resolved to `0.1.7`), which defines the
+   `tree-sitter-language ^0.1` shim (resolved to `0.1.9`), which defines the
    `LanguageFn` type the grammars export. So the core version is chosen
-   independently: we pin `tree-sitter = "0.25"` (resolves to **0.25.10**), whose
-   MSRV (1.76) is under the workspace `rust-version = 1.86`. (0.26 also works; we
-   stay on the well-worn 0.25 line.) Do NOT try to match grammar version numbers
+   independently: we pin `tree-sitter = "0.27"`, whose MSRV (1.90) is under the
+   workspace `rust-version = 1.97` (set by the vgi 0.46 SDK). Do NOT try to match grammar version numbers
    to the core — they intentionally diverge.
 
-2. **`tree-sitter` 0.25 query matches are a `streaming-iterator`.** `QueryCursor::
+2. **`tree-sitter` query matches are a `streaming-iterator`.** `QueryCursor::
    matches(...)` returns a `StreamingIterator`, not a plain `Iterator`. Iterate it
    with `while let Some(m) = matches.next()` (the `streaming_iterator::Streaming
    Iterator` trait is imported in `parsing.rs`). Hence the explicit

@@ -132,21 +132,22 @@ fn catalog_metadata(name: &str) -> CatalogModel {
             ),
             // VGI152: analyst task suite `vgi-lint simulate` runs to measure how
             // well an agent actually uses this worker. Each task is a natural-
-            // language prompt with the SQL a correct answer should be equivalent to.
+            // language prompt; the SQL a correct answer should be equivalent to
+            // lives in the private `vgi-agent-tests.yaml` sidecar (VGI416).
             (
                 "vgi.agent_test_tasks".to_string(),
                 r#"[
-                  {"name":"detect_language","prompt":"Using this worker, what programming language does the file named 'server.py' contain? Return a single value: the detected language id.","reference_sql":"SELECT code.main.language_of('server.py')","ignore_column_names":true},
-                  {"name":"count_functions","prompt":"Using this worker, how many function definitions are in this Rust source string: 'fn a() {} fn b() {} fn c() {}' ? Return the single integer count.","reference_sql":"SELECT code.main.count_functions('fn a() {} fn b() {} fn c() {}', 'rust')","ignore_column_names":true},
-                  {"name":"count_lines","prompt":"Using this worker, how many physical lines are in this source string: 'fn a() {}\nfn b() {}\nfn c() {}\n' ? Return the single integer count.","reference_sql":"SELECT code.main.count_lines('fn a() {}\nfn b() {}\nfn c() {}\n')","ignore_column_names":true},
-                  {"name":"extract_imports","prompt":"Using this worker, extract the import statements from this Python source string: 'import os\nimport sys' . Return one import per row as a single column.","reference_sql":"SELECT UNNEST(code.main.extract_imports('import os\nimport sys', 'python'))","ignore_column_names":true,"unordered":true},
-                  {"name":"list_symbols","prompt":"Using this worker, list the names of the top-level definitions in this Rust source string: 'fn a() {} struct S {}' . Return just the names, one per row.","reference_sql":"SELECT name FROM code.main.symbols('fn a() {} struct S {}', 'rust')","ignore_column_names":true,"unordered":true},
-                  {"name":"supported_languages","prompt":"Using this worker, which programming languages can it parse? Return the language ids, one per row.","reference_sql":"SELECT language FROM code.main.supported_languages","ignore_column_names":true,"unordered":true},
-                  {"name":"count_loc","prompt":"Using this worker, how many lines of code (excluding blank and comment lines) are in this Rust source string: 'fn a() {}\n// note\nfn b() {}\n' ? Return the single integer.","reference_sql":"SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust')","ignore_column_names":true},
-                  {"name":"extract_comments","prompt":"Using this worker, extract the comment texts from this Rust source string: '// header\nfn a() {}\n' . Return one comment per row.","reference_sql":"SELECT UNNEST(code.main.extract_comments('// header\nfn a() {}\n', 'rust'))","ignore_column_names":true,"unordered":true},
-                  {"name":"extract_strings","prompt":"Using this worker, extract the string literals from this Rust source string: 'let s = \"hello\";\n' . Return one string literal per row (each with its surrounding quotes).","reference_sql":"SELECT UNNEST(code.main.extract_strings('let s = \"hello\";\n', 'rust'))","ignore_column_names":true,"unordered":true},
-                  {"name":"ts_query_names","prompt":"Using this worker, run the tree-sitter query '(function_item name: (identifier) @n)' over this Rust source string: 'fn alpha() {}\nfn beta() {}\n' and return each captured node's text, one per row.","reference_sql":"SELECT UNNEST(code.main.ts_query('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)'))","ignore_column_names":true,"unordered":true},
-                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row.","reference_sql":"SELECT text FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq","ignore_column_names":true}
+                  {"name":"detect_language","prompt":"Using this worker, what programming language does the file named 'server.py' contain? Return a single value: the detected language id."},
+                  {"name":"count_functions","prompt":"Using this worker, how many function definitions are in this Rust source string: 'fn a() {} fn b() {} fn c() {}' ? Return the single integer count."},
+                  {"name":"count_lines","prompt":"Using this worker, how many physical lines are in this source string: 'fn a() {}\nfn b() {}\nfn c() {}\n' ? Return the single integer count."},
+                  {"name":"extract_imports","prompt":"Using this worker, extract the import statements from this Python source string: 'import os\nimport sys' . Return one import per row as a single column."},
+                  {"name":"list_symbols","prompt":"Using this worker, list the names of the top-level definitions in this Rust source string: 'fn a() {} struct S {}' . Return just the names, one per row."},
+                  {"name":"supported_languages","prompt":"Using this worker, which programming languages can it parse? Return the language ids, one per row."},
+                  {"name":"count_loc","prompt":"Using this worker, how many lines of code (excluding blank and comment lines) are in this Rust source string: 'fn a() {}\n// note\nfn b() {}\n' ? Return the single integer."},
+                  {"name":"extract_comments","prompt":"Using this worker, extract the comment texts from this Rust source string: '// header\nfn a() {}\n' . Return one comment per row."},
+                  {"name":"extract_strings","prompt":"Using this worker, extract the string literals from this Rust source string: 'let s = \"hello\";\n' . Return one string literal per row (each with its surrounding quotes)."},
+                  {"name":"ts_query_names","prompt":"Using this worker, run the tree-sitter query '(function_item name: (identifier) @n)' over this Rust source string: 'fn alpha() {}\nfn beta() {}\n' and return each captured node's text, one per row."},
+                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row."}
                 ]"#
                     .to_string(),
             ),
@@ -158,6 +159,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
         implementation_version: Some(version().to_string()),
         schemas: vec![CatSchema {
             name: "main".to_string(),
+            path: Vec::new(),
             comment: Some(
                 "Source-code structure functions: language detection, line/function counts, \
                  import/comment/string extraction, tree-sitter queries and symbol listing."

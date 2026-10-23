@@ -1,0 +1,48 @@
+# Private graders for the agent-suitability suite (`vgi-lint simulate`).
+#
+# The prompts are published in the catalog's vgi.agent_test_tasks tag
+# (crates/code-worker/src/lib.rs); the answers live here, keyed by task
+# name, so the agent being graded never sees them. vgi-lint discovers this
+# file in the directory it runs from. Every task passes its source inline,
+# so the suite needs no external fixtures.
+
+tasks:
+  - name: detect_language
+    reference_sql: "SELECT code.main.language_of('server.py')"
+    ignore_column_names: true
+  - name: count_functions
+    reference_sql: "SELECT code.main.count_functions('fn a() {} fn b() {} fn c() {}', 'rust')"
+    ignore_column_names: true
+  - name: count_lines
+    reference_sql: "SELECT code.main.count_lines('fn a() {}\nfn b() {}\nfn c() {}\n')"
+    ignore_column_names: true
+  - name: extract_imports
+    reference_sql: "SELECT UNNEST(code.main.extract_imports('import os\nimport sys', 'python'))"
+    unordered: true
+    ignore_column_names: true
+  - name: list_symbols
+    reference_sql: "SELECT name FROM code.main.symbols('fn a() {} struct S {}', 'rust')"
+    unordered: true
+    ignore_column_names: true
+  - name: supported_languages
+    reference_sql: "SELECT language FROM code.main.supported_languages"
+    unordered: true
+    ignore_column_names: true
+  - name: count_loc
+    reference_sql: "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust')"
+    ignore_column_names: true
+  - name: extract_comments
+    reference_sql: "SELECT UNNEST(code.main.extract_comments('// header\nfn a() {}\n', 'rust'))"
+    unordered: true
+    ignore_column_names: true
+  - name: extract_strings
+    reference_sql: "SELECT UNNEST(code.main.extract_strings('let s = \"hello\";\n', 'rust'))"
+    unordered: true
+    ignore_column_names: true
+  - name: ts_query_names
+    reference_sql: "SELECT UNNEST(code.main.ts_query('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)'))"
+    unordered: true
+    ignore_column_names: true
+  - name: ts_nodes_captures
+    reference_sql: "SELECT text FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq"
+    ignore_column_names: true

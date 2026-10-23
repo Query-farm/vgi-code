@@ -189,4 +189,10 @@ impl TableProducer for NodesProducer {
                 .map_err(|e| RpcError::runtime_error(e.to_string()))?,
         ))
     }
+
+    fn resume_supported(&self) -> bool {
+        // Single batch: there is nothing to resume. Declared explicitly —
+        // `resume_supported` has no default, so every producer states this.
+        false
+    }
 }

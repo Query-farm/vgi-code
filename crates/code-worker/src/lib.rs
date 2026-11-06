@@ -34,6 +34,7 @@ mod table;
 use std::sync::Arc;
 
 use vgi::catalog::{CatSchema, CatTable, CatalogModel};
+use vgi::constraints::{constraint_record, ConstraintKind, ConstraintRecord};
 use vgi::Worker;
 
 /// Worker version string, published as the catalog `implementation_version`.
@@ -256,11 +257,27 @@ fn supported_languages_table() -> CatTable {
         ),
         Some(parsing::SUPPORTED.len() as i64),
     );
-    // `language` (column 0) uniquely identifies each row, so declare it the
-    // primary key (VGI807) — this also satisfies the catalog-level
-    // "no constraints declared" nudge (VGI806).
-    t.primary_key = vec![vec![0]];
-    t.not_null = vec![0];
+    // `language` uniquely identifies each row, so declare it the primary key
+    // (VGI807) — this also satisfies the catalog-level "no constraints declared"
+    // nudge (VGI806). vgi.v3 carries constraints as canonical records (columns by
+    // name; ENFORCED so the extension reads them).
+    t.constraints = [
+        ("supported_languages.pk", ConstraintKind::PrimaryKey),
+        (
+            "supported_languages.language.not_null",
+            ConstraintKind::NotNull,
+        ),
+    ]
+    .into_iter()
+    .map(|(id, kind)| {
+        constraint_record(
+            &ConstraintRecord::new(&["main"], "supported_languages", id, kind)
+                .with_columns(&[&["language"]])
+                .enforced(),
+        )
+        .expect("valid constraint record")
+    })
+    .collect();
     t.tags = vec![
         (
             "vgi.title".to_string(),

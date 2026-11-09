@@ -488,7 +488,7 @@ dependencies = [
 
 [[package]]
 name = "code-wasm"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "code-worker",
  "vgi",
@@ -496,7 +496,7 @@ dependencies = [
 
 [[package]]
 name = "code-worker"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "arrow-array",
  "arrow-buffer",

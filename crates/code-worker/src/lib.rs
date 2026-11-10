@@ -60,6 +60,11 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                 "Source-Code Structure Analysis".to_string(),
             ),
             (
+                "vgi.subtitle".to_string(),
+                "Detect languages, count lines and functions, and extract symbols, imports and comments from source code."
+                    .to_string(),
+            ),
+            (
                 "vgi.keywords".to_string(),
                 r#"["code","source code","tree-sitter","parsing","symbols","functions","imports","comments","string literals","lines of code","loc","language detection","syntax tree","static analysis","rust","python","javascript","typescript","go","java","c","cpp","json"]"#
                     .to_string(),
@@ -167,7 +172,7 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                     .to_string(),
             ),
             tags: vec![
-                ("vgi.title".to_string(), "Code — main".to_string()),
+                ("vgi.title".to_string(), "Code".to_string()),
                 (
                     "vgi.keywords".to_string(),
                     r#"["code","tree-sitter","language_of","count_lines","loc","count_functions","extract_imports","extract_comments","extract_strings","ts_query","symbols","ts_nodes","supported_languages","parsing","static analysis","syntax tree"]"#

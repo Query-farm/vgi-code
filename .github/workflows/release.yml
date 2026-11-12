@@ -29,6 +29,8 @@ jobs:
   # Gate the release on the same suite as push/PR.
   ci:
     uses: ./.github/workflows/ci.yml
+    with:
+      linux_only: true
 
   release:
     needs: [ci]

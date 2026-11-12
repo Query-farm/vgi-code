@@ -22,7 +22,7 @@ best-effort and never crashes the worker.
 
 ```sql
 LOAD vgi;
-ATTACH 'code' (TYPE vgi, LOCATION 'github-auto://Query-farm/vgi-code@v0.3.0');
+ATTACH 'code' (TYPE vgi, LOCATION 'github-auto://Query-farm/vgi-code@v0.4.0');
 SET search_path = 'code.main';
 
 -- Infer a language from a filename.
@@ -61,7 +61,7 @@ Every [GitHub release](https://github.com/Query-farm/vgi-code/releases) ships a 
 INSTALL vgi FROM community;
 LOAD vgi;
 
-ATTACH 'code' AS code (TYPE vgi, LOCATION 'github-auto://Query-farm/vgi-code@v0.3.0');
+ATTACH 'code' AS code (TYPE vgi, LOCATION 'github-auto://Query-farm/vgi-code@v0.4.0');
 
 -- Detect a file's language from its extension.
 SELECT code.main.language_of('src/main.rs');
@@ -73,14 +73,14 @@ fn b() {}
 ', 'rust');
 ```
 
-Prebuilt binaries cover macOS (Apple silicon), Linux (x86-64 and arm64). `github-auto://` needs an explicit release tag; change `@v0.3.0` to move to a newer release.
+Prebuilt binaries cover macOS (Apple silicon), Linux (x86-64 and arm64). `github-auto://` needs an explicit release tag; change `@v0.4.0` to move to a newer release.
 
 ### Other ways to run it
 
 - **Docker** (the image bundles the worker; needs a container runtime):
 
   ```sql
-  ATTACH 'code' AS code (TYPE vgi, LOCATION 'docker://ghcr.io/query-farm/vgi-code:0.3.0');
+  ATTACH 'code' AS code (TYPE vgi, LOCATION 'docker://ghcr.io/query-farm/vgi-code:0.4.0');
   ```
 
 - **Manual download.** Download the archive for your platform from the [releases page](https://github.com/Query-farm/vgi-code/releases), verify it against its `.sha256` file (a cosign `.cosign.bundle` is published alongside), unpack it, and set `LOCATION` to the path of the extracted worker executable.

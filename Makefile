@@ -9,7 +9,7 @@
 #
 # The SQL E2E suite drives the compiled worker through DuckDB via
 # `haybarn-unittest` (install with:
-# `uv tool install --prerelease allow 'haybarn-unittest>=2.0.0rc11,<2.1'`; haybarn 2.0 rc11+ is required for VGI protocol 3.2).
+# `uv tool install --prerelease allow 'haybarn-unittest>=2.0.0rc11,<2.1'`; haybarn 2.0 rc11+ is required for VGI protocol 3.3).
 
 # Path to the released worker binary handed to DuckDB as the ATTACH LOCATION.
 WORKER         ?= $(CURDIR)/target/release/code-worker

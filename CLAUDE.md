@@ -54,7 +54,7 @@ Per-language tree-sitter **queries** drive every extraction:
    `tree-sitter-language ^0.1` shim (resolved to `0.1.9`), which defines the
    `LanguageFn` type the grammars export. So the core version is chosen
    independently: we pin `tree-sitter = "0.27"`, whose MSRV (1.90) is under the
-   workspace `rust-version = 1.97` (set by the vgi 0.50.0 SDK, VGI protocol 3.2 / haybarn 2.0). Do NOT try to match grammar version numbers
+   workspace `rust-version = 1.97` (set by the vgi 0.51.0 SDK, VGI protocol 3.3 / haybarn 2.0). Do NOT try to match grammar version numbers
    to the core — they intentionally diverge.
 
 2. **`tree-sitter` query matches are a `streaming-iterator`.** `QueryCursor::

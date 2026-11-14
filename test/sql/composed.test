@@ -1,0 +1,52 @@
+# name: test/sql/composed.test
+# group: [vgi_code]
+#
+# Composed queries: two or more of the worker's objects in one statement. These
+# mirror the composed examples in crates/code-worker/src/examples.rs and the
+# composed agent-task graders in vgi-agent-tests.yaml, so the published examples
+# are pinned to their documented output. Multi-line sources use E'...\n...'.
+
+require-env VGI_CODE_WORKER
+
+statement ok
+LOAD vgi;
+
+statement ok
+ATTACH 'code' AS code (TYPE vgi, LOCATION '${VGI_CODE_WORKER}');
+
+# language_of routes each file to loc / count_functions / extract_imports.
+query TTIII
+SELECT f.path, code.main.language_of(f.path) AS lang, code.main.loc(f.src, code.main.language_of(f.path)) AS code_lines, code.main.count_functions(f.src, code.main.language_of(f.path)) AS functions, len(code.main.extract_imports(f.src, code.main.language_of(f.path))) AS imports FROM (VALUES ('src/lib.rs', E'use std::fmt;\n// helper\nfn a() {}\nfn b() {}\n'), ('app/main.py', E'import os\n\ndef run():\n    pass\n')) AS f(path, src) ORDER BY f.path;
+----
+app/main.py	python	3	1	1
+src/lib.rs	rust	3	2	1
+
+# symbols' function spans joined with ts_nodes' call sites → call graph.
+query TTI
+SELECT s.name AS caller, c.text AS callee, c.start_line FROM code.main.symbols(E'fn main() {\n    parse();\n    run();\n}\nfn run() {\n    log();\n}\n', 'rust') AS s JOIN code.main.ts_nodes(E'fn main() {\n    parse();\n    run();\n}\nfn run() {\n    log();\n}\n', 'rust', '(call_expression function: (identifier) @callee)') AS c ON c.start_line BETWEEN s.start_line AND s.end_line WHERE s.kind = 'function' ORDER BY c.start_line;
+----
+main	parse	2
+main	run	3
+run	log	6
+
+# ts_nodes captures whole functions; scalars measure each one.
+query TII
+SELECT code.main.ts_query(n.text, 'rust', '(function_item name: (identifier) @n)')[1] AS function_name, code.main.loc(n.text, 'rust') AS code_lines, len(code.main.extract_comments(n.text, 'rust')) AS comments FROM code.main.ts_nodes(E'fn small() {}\nfn add(a: i32, b: i32) -> i32 {\n    // sum the inputs\n    a + b\n}\n', 'rust', '(function_item) @f') AS n ORDER BY n.seq;
+----
+small	1	0
+add	3	1
+
+# Grader: todo_owner_function.
+query T
+SELECT s.name FROM code.main.symbols(E'fn load() {\n    // TODO: retry\n}\nfn save() {\n    // ok\n}\n', 'rust') AS s JOIN code.main.ts_nodes(E'fn load() {\n    // TODO: retry\n}\nfn save() {\n    // ok\n}\n', 'rust', '(line_comment) @c') AS c ON c.start_line BETWEEN s.start_line AND s.end_line WHERE s.kind = 'function' AND c.text LIKE '%TODO%';
+----
+load
+
+# Grader: language_most_functions (go 3 > rust 2 > python 1).
+query T
+SELECT code.main.language_of(f.path) FROM (VALUES ('util.py', E'def a(): pass\n'), ('main.go', E'package m\nfunc A() {}\nfunc B() {}\nfunc C() {}\n'), ('lib.rs', E'fn x() {}\nfn y() {}\n')) AS f(path, src) ORDER BY code.main.count_functions(f.src, code.main.language_of(f.path)) DESC LIMIT 1;
+----
+go
+
+statement ok
+DETACH code;

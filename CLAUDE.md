@@ -19,6 +19,7 @@ crates/code-worker/
   src/main.rs                       Worker::new(); registers scalars + tables
   src/parsing.rs                    PURE logic (no Arrow): language registry, parse,
                                     symbols/imports/comments/strings/loc/queries + unit tests
+  src/examples.rs                   composed (description, sql) example constants, shared by every list
   src/arrow_io.rs                   VARCHAR cell reads + LIST(VARCHAR) builder + in-process scalar harness
   src/scalar/{language,counts,lists,query,version,mod}.rs   thin Arrow scalar adapters
   src/table/{symbols,ts_nodes,supported_languages,mod}.rs   thin Arrow table-producer adapters

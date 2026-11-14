@@ -39,19 +39,27 @@ impl ScalarFunction for LanguageOf {
             "Language Detection & Discovery",
             "scalar/language.rs",
         );
-        tags.push(crate::meta::example_queries_tag(&[(
-            EXAMPLE_DESC,
-            EXAMPLE_SQL,
-        )]));
+        let (file_metrics_desc, file_metrics_sql) = crate::examples::FILE_METRICS;
+        tags.push(crate::meta::example_queries_tag(&[
+            (EXAMPLE_DESC, EXAMPLE_SQL),
+            (file_metrics_desc, file_metrics_sql),
+        ]));
         FunctionMetadata {
             description: "Infer the source language from a filename's extension (NULL if unknown)"
                 .into(),
             return_type: Some(DataType::Utf8),
-            examples: vec![FunctionExample {
-                sql: EXAMPLE_SQL.into(),
-                description: EXAMPLE_DESC.into(),
-                expected_output: None,
-            }],
+            examples: vec![
+                FunctionExample {
+                    sql: EXAMPLE_SQL.into(),
+                    description: EXAMPLE_DESC.into(),
+                    expected_output: None,
+                },
+                FunctionExample {
+                    sql: file_metrics_sql.into(),
+                    description: file_metrics_desc.into(),
+                    expected_output: None,
+                },
+            ],
             tags,
             ..Default::default()
         }

@@ -75,6 +75,7 @@ impl TableFunction for Symbols {
                 "Count the defined symbols by kind in a Python source string.",
                 "SELECT kind, count(*) AS n FROM code.main.symbols('class C:\n    def m(self): pass\ndef f(): pass\n', 'python') GROUP BY kind ORDER BY kind",
             ),
+            crate::examples::CALL_GRAPH,
         ]));
         FunctionMetadata {
             description:

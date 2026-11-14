@@ -16,44 +16,46 @@ use crate::parsing;
 /// self-contained and re-runnable against an attached `code` worker. We omit
 /// `expected_result` deliberately — the linter only needs each query to execute
 /// cleanly, and the version string / row order would make exact output brittle.
-const EXECUTABLE_EXAMPLES: &str = r#"[
-  {
-    "description": "List every language id the worker can parse.",
-    "sql": "SELECT language FROM code.main.supported_languages() ORDER BY language"
-  },
-  {
-    "description": "Detect a file's language from its extension.",
-    "sql": "SELECT code.main.language_of('src/main.rs') AS lang"
-  },
-  {
-    "description": "Count the physical lines in a source string.",
-    "sql": "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n') AS lines"
-  },
-  {
-    "description": "Count the lines of code, excluding blank and comment lines.",
-    "sql": "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust') AS loc"
-  },
-  {
-    "description": "Count function/method definitions in Python source.",
-    "sql": "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python') AS fns"
-  },
-  {
-    "description": "Extract the import statements from Python source.",
-    "sql": "SELECT code.main.extract_imports('import os\nimport sys\n', 'python') AS imports"
-  },
-  {
-    "description": "List the structural symbols of a Rust source doc.",
-    "sql": "SELECT kind, name, start_line FROM code.main.symbols('fn alpha() {}\nfn beta() {}\n', 'rust') ORDER BY start_line"
-  },
-  {
-    "description": "Run a tree-sitter query and read its captures as rows.",
-    "sql": "SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq"
-  },
-  {
-    "description": "Extract the comment texts from a Rust source string.",
-    "sql": "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust') AS comments"
-  }
-]"#;
+const EXECUTABLE_EXAMPLES: &[(&str, &str)] = &[
+    (
+        "List every language id the worker can parse.",
+        "SELECT language FROM code.main.supported_languages() ORDER BY language",
+    ),
+    (
+        "Detect a file's language from its extension.",
+        "SELECT code.main.language_of('src/main.rs') AS lang",
+    ),
+    (
+        "Count the physical lines in a source string.",
+        "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n') AS lines",
+    ),
+    (
+        "Count the lines of code, excluding blank and comment lines.",
+        "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust') AS loc",
+    ),
+    (
+        "Count function/method definitions in Python source.",
+        "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python') AS fns",
+    ),
+    (
+        "Extract the import statements from Python source.",
+        "SELECT code.main.extract_imports('import os\nimport sys\n', 'python') AS imports",
+    ),
+    (
+        "List the structural symbols of a Rust source doc.",
+        "SELECT kind, name, start_line FROM code.main.symbols('fn alpha() {}\nfn beta() {}\n', 'rust') ORDER BY start_line",
+    ),
+    (
+        "Run a tree-sitter query and read its captures as rows.",
+        "SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq",
+    ),
+    (
+        "Extract the comment texts from a Rust source string.",
+        "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust') AS comments",
+    ),
+    // Composed: symbols' function spans joined with ts_nodes' call sites.
+    crate::examples::CALL_GRAPH,
+];
 
 pub struct SupportedLanguages;
 
@@ -106,7 +108,10 @@ impl TableFunction for SupportedLanguages {
 ]"#
             .into(),
         ));
-        tags.push(("vgi.executable_examples".into(), EXECUTABLE_EXAMPLES.into()));
+        tags.push((
+            "vgi.executable_examples".into(),
+            crate::meta::examples_json(EXECUTABLE_EXAMPLES),
+        ));
         FunctionMetadata {
             description: "List the language ids this worker can parse".into(),
             tags,

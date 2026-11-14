@@ -76,6 +76,7 @@ impl TableFunction for TsNodes {
                 "Return just the captured node texts and their line spans.",
                 "SELECT text, start_line FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq",
             ),
+            crate::examples::FUNCTION_METRICS,
         ]));
         FunctionMetadata {
             description:

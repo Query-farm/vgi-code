@@ -46,3 +46,9 @@ tasks:
   - name: ts_nodes_captures
     reference_sql: "SELECT text FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq"
     ignore_column_names: true
+  - name: todo_owner_function
+    reference_sql: "SELECT s.name FROM code.main.symbols('fn load() {\n    // TODO: retry\n}\nfn save() {\n    // ok\n}\n', 'rust') AS s JOIN code.main.ts_nodes('fn load() {\n    // TODO: retry\n}\nfn save() {\n    // ok\n}\n', 'rust', '(line_comment) @c') AS c ON c.start_line BETWEEN s.start_line AND s.end_line WHERE s.kind = 'function' AND c.text LIKE '%TODO%'"
+    ignore_column_names: true
+  - name: language_most_functions
+    reference_sql: "SELECT code.main.language_of(f.path) FROM (VALUES ('util.py', 'def a(): pass\n'), ('main.go', 'package m\nfunc A() {}\nfunc B() {}\nfunc C() {}\n'), ('lib.rs', 'fn x() {}\nfn y() {}\n')) AS f(path, src) ORDER BY code.main.count_functions(f.src, code.main.language_of(f.path)) DESC LIMIT 1"
+    ignore_column_names: true

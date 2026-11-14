@@ -49,6 +49,18 @@ SELECT * FROM symbols('fn add(a:i32,b:i32)->i32{a+b}', 'rust');
 -- Arbitrary query matches as rows.
 SELECT * FROM ts_nodes('func A(){}', 'go', '(function_declaration) @f');
 
+-- Combine them: a call graph from symbols' function spans + ts_nodes' call sites.
+SELECT s.name AS caller, c.text AS callee
+FROM symbols(E'fn main() {\n    run();\n}\nfn run() {\n    log();\n}\n', 'rust') AS s
+JOIN ts_nodes(E'fn main() {\n    run();\n}\nfn run() {\n    log();\n}\n', 'rust',
+              '(call_expression function: (identifier) @callee)') AS c
+  ON c.start_line BETWEEN s.start_line AND s.end_line
+WHERE s.kind = 'function'
+ORDER BY c.start_line;
+-- caller | callee
+-- main   | run
+-- run    | log
+
 -- Discover what the worker can parse.
 SELECT * FROM supported_languages();
 ```

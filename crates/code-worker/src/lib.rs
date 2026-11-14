@@ -26,6 +26,7 @@
 //! same `Worker` over a SharedArrayBuffer byte channel instead).
 
 mod arrow_io;
+mod examples;
 mod meta;
 mod parsing;
 mod scalar;
@@ -153,7 +154,9 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                   {"name":"extract_comments","prompt":"Using this worker, extract the comment texts from this Rust source string: '// header\nfn a() {}\n' . Return one comment per row."},
                   {"name":"extract_strings","prompt":"Using this worker, extract the string literals from this Rust source string: 'let s = \"hello\";\n' . Return one string literal per row (each with its surrounding quotes)."},
                   {"name":"ts_query_names","prompt":"Using this worker, run the tree-sitter query '(function_item name: (identifier) @n)' over this Rust source string: 'fn alpha() {}\nfn beta() {}\n' and return each captured node's text, one per row."},
-                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row."}
+                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row."},
+                  {"name":"todo_owner_function","prompt":"Using this worker, which function in this Rust source string contains the comment that mentions TODO: 'fn load() {\n    // TODO: retry\n}\nfn save() {\n    // ok\n}\n' ? Return a single value: the function's name."},
+                  {"name":"language_most_functions","prompt":"Using this worker, consider three files: 'util.py' with source 'def a(): pass\n', 'main.go' with source 'package m\nfunc A() {}\nfunc B() {}\nfunc C() {}\n', and 'lib.rs' with source 'fn x() {}\nfn y() {}\n'. Detect each file's language from its filename and count its function definitions. Which language has the most function definitions? Return a single value: the language id."}
                 ]"#
                     .to_string(),
             ),
@@ -213,18 +216,18 @@ fn catalog_metadata(name: &str) -> CatalogModel {
                 // VGI506/VGI515 representative example queries for the schema, as a
                 // JSON list of {description, sql} so every example carries a
                 // human-readable description (the native examples carrier drops it).
-                (
-                    "vgi.example_queries".to_string(),
-                    r#"[
-                      {"description":"Detect a file's language from its extension.","sql":"SELECT code.main.language_of('src/main.rs')"},
-                      {"description":"Count the lines of code (excluding blank and comment lines) in a Rust source string.","sql":"SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust')"},
-                      {"description":"Count the function definitions in a Python source string.","sql":"SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python')"},
-                      {"description":"Extract each Python import statement, one per row.","sql":"SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python')) AS import"},
-                      {"description":"List the function symbols and their line spans in a Rust source string.","sql":"SELECT name, start_line, end_line FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust') WHERE kind = 'function'"},
-                      {"description":"List every language id the worker can parse.","sql":"SELECT language FROM code.main.supported_languages ORDER BY language"}
-                    ]"#
-                        .to_string(),
-                ),
+                crate::meta::example_queries_tag(&[
+                    ("Detect a file's language from its extension.", "SELECT code.main.language_of('src/main.rs')"),
+                    ("Count the lines of code (excluding blank and comment lines) in a Rust source string.", "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust')"),
+                    ("Count the function definitions in a Python source string.", "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python')"),
+                    ("Extract each Python import statement, one per row.", "SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python')) AS import"),
+                    ("List the function symbols and their line spans in a Rust source string.", "SELECT name, start_line, end_line FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust') WHERE kind = 'function' ORDER BY start_line"),
+                    ("List every language id the worker can parse.", "SELECT language FROM code.main.supported_languages ORDER BY language"),
+                    // Composed: two or more of the worker's objects in one query.
+                    examples::FILE_METRICS,
+                    examples::CALL_GRAPH,
+                    examples::FUNCTION_METRICS,
+                ]),
                 // VGI413: ordered category registry. Every function/table declares
                 // a matching `vgi.category`; these drive the worker's navigation,
                 // listing sections and SEO descriptions.

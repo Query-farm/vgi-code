@@ -52,6 +52,13 @@ fn json_escape(s: &str) -> String {
 /// `duckdb_functions().examples` drops the per-example description, so every
 /// function also publishes its examples through this tag, which preserves them.
 pub fn example_queries_tag(examples: &[(&str, &str)]) -> (String, String) {
+    ("vgi.example_queries".to_string(), examples_json(examples))
+}
+
+/// Serialize `(description, sql)` pairs as the JSON list
+/// `[{"description":…,"sql":…}]` shared by `vgi.example_queries` and
+/// `vgi.executable_examples`.
+pub fn examples_json(examples: &[(&str, &str)]) -> String {
     let items: Vec<String> = examples
         .iter()
         .map(|(desc, sql)| {
@@ -62,10 +69,7 @@ pub fn example_queries_tag(examples: &[(&str, &str)]) -> (String, String) {
             )
         })
         .collect();
-    (
-        "vgi.example_queries".to_string(),
-        format!("[{}]", items.join(",")),
-    )
+    format!("[{}]", items.join(","))
 }
 
 /// Build the standard per-object discovery/description tags.

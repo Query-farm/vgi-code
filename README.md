@@ -65,6 +65,11 @@ ORDER BY c.start_line;
 SELECT * FROM supported_languages();
 ```
 
+## Executed notebooks
+
+See [the SQL and visualization examples](notebooks/README.md) for a portable,
+executed walkthrough of parser recovery, function review and nested line spans.
+
 ## Quick start
 
 Every [GitHub release](https://github.com/Query-farm/vgi-code/releases) ships a prebuilt worker binary. The `vgi` extension downloads the one for your platform, checks its SHA-256 and caches it, so there is nothing to install besides DuckDB:

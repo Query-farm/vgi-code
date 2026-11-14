@@ -1,0 +1,291 @@
+diff --git a/crates/code-worker/src/examples.rs b/crates/code-worker/src/examples.rs
+new file mode 100644
+index 0000000..5ad62ed
+--- /dev/null
++++ b/crates/code-worker/src/examples.rs
+@@ -0,0 +1,35 @@
++//! Composed example queries: realistic SQL that combines two or more of this
++//! worker's own objects (a scalar feeding another scalar, two table functions
++//! joined on line spans, scalars applied to a table function's rows).
++//!
++//! Each `(description, sql)` pair is defined once here and referenced from the
++//! schema-level `vgi.example_queries` list (`lib.rs`) and from the per-object
++//! example list of the object that drives the query, so the copies cannot
++//! drift. Every query is offline and deterministic (inline source literals).
++
++/// `language_of` routes each file to the right grammar for `loc`,
++/// `count_functions` and `extract_imports` — per-file metrics over a table of
++/// `(path, source)` rows. Driven by `language_of`.
++pub const FILE_METRICS: (&str, &str) = (
++    "Per-file code metrics over a table of (path, source) rows: detect each file's language from \
++     its path with language_of and pass it to loc, count_functions and extract_imports.",
++    "SELECT f.path, code.main.language_of(f.path) AS lang, code.main.loc(f.src, code.main.language_of(f.path)) AS code_lines, code.main.count_functions(f.src, code.main.language_of(f.path)) AS functions, len(code.main.extract_imports(f.src, code.main.language_of(f.path))) AS imports FROM (VALUES ('src/lib.rs', 'use std::fmt;\n// helper\nfn a() {}\nfn b() {}\n'), ('app/main.py', 'import os\n\ndef run():\n    pass\n')) AS f(path, src) ORDER BY f.path",
++);
++
++/// A tiny call graph: `symbols` gives each function's line span, `ts_nodes`
++/// gives every call site's line; joining one into the other attributes each
++/// call to the function that makes it. Driven by `symbols`.
++pub const CALL_GRAPH: (&str, &str) = (
++    "Build a call graph: join the function spans from symbols with the call sites captured by \
++     ts_nodes to list which function calls which.",
++    "SELECT s.name AS caller, c.text AS callee, c.start_line FROM code.main.symbols('fn main() {\n    parse();\n    run();\n}\nfn run() {\n    log();\n}\n', 'rust') AS s JOIN code.main.ts_nodes('fn main() {\n    parse();\n    run();\n}\nfn run() {\n    log();\n}\n', 'rust', '(call_expression function: (identifier) @callee)') AS c ON c.start_line BETWEEN s.start_line AND s.end_line WHERE s.kind = 'function' ORDER BY c.start_line",
++);
++
++/// `ts_nodes` captures each whole function's source text; the scalars then
++/// measure each one — its name (`ts_query`), lines of code (`loc`) and comment
++/// count (`extract_comments`). Driven by `ts_nodes`.
++pub const FUNCTION_METRICS: (&str, &str) = (
++    "Per-function metrics: capture each Rust function's source with ts_nodes, then read its name \
++     with ts_query and measure it with loc and extract_comments.",
++    "SELECT code.main.ts_query(n.text, 'rust', '(function_item name: (identifier) @n)')[1] AS function_name, code.main.loc(n.text, 'rust') AS code_lines, len(code.main.extract_comments(n.text, 'rust')) AS comments FROM code.main.ts_nodes('fn small() {}\nfn add(a: i32, b: i32) -> i32 {\n    // sum the inputs\n    a + b\n}\n', 'rust', '(function_item) @f') AS n ORDER BY n.seq",
++);
+diff --git a/crates/code-worker/src/lib.rs b/crates/code-worker/src/lib.rs
+index d0be98f..f889c46 100644
+--- a/crates/code-worker/src/lib.rs
++++ b/crates/code-worker/src/lib.rs
+@@ -26,6 +26,7 @@
+ //! same `Worker` over a SharedArrayBuffer byte channel instead).
+ 
+ mod arrow_io;
++mod examples;
+ mod meta;
+ mod parsing;
+ mod scalar;
+@@ -153,7 +154,9 @@ fn catalog_metadata(name: &str) -> CatalogModel {
+                   {"name":"extract_comments","prompt":"Using this worker, extract the comment texts from this Rust source string: '// header\nfn a() {}\n' . Return one comment per row."},
+                   {"name":"extract_strings","prompt":"Using this worker, extract the string literals from this Rust source string: 'let s = \"hello\";\n' . Return one string literal per row (each with its surrounding quotes)."},
+                   {"name":"ts_query_names","prompt":"Using this worker, run the tree-sitter query '(function_item name: (identifier) @n)' over this Rust source string: 'fn alpha() {}\nfn beta() {}\n' and return each captured node's text, one per row."},
+-                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row."}
++                  {"name":"ts_nodes_captures","prompt":"Using this worker, using the table-valued form, run the tree-sitter query '(function_item name: (identifier) @n)' over the Rust source 'fn alpha() {}\nfn beta() {}\n' and return the captured node texts, one per row."},
++                  {"name":"todo_owner_function","prompt":"Using this worker, which function in this Rust source string contains the comment that mentions TODO: 'fn load() {\n    // TODO: retry\n}\nfn save() {\n    // ok\n}\n' ? Return a single value: the function's name."},
++                  {"name":"language_most_functions","prompt":"Using this worker, consider three files: 'util.py' with source 'def a(): pass\n', 'main.go' with source 'package m\nfunc A() {}\nfunc B() {}\nfunc C() {}\n', and 'lib.rs' with source 'fn x() {}\nfn y() {}\n'. Detect each file's language from its filename and count its function definitions. Which language has the most function definitions? Return a single value: the language id."}
+                 ]"#
+                     .to_string(),
+             ),
+@@ -213,18 +216,18 @@ fn catalog_metadata(name: &str) -> CatalogModel {
+                 // VGI506/VGI515 representative example queries for the schema, as a
+                 // JSON list of {description, sql} so every example carries a
+                 // human-readable description (the native examples carrier drops it).
+-                (
+-                    "vgi.example_queries".to_string(),
+-                    r#"[
+-                      {"description":"Detect a file's language from its extension.","sql":"SELECT code.main.language_of('src/main.rs')"},
+-                      {"description":"Count the lines of code (excluding blank and comment lines) in a Rust source string.","sql":"SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust')"},
+-                      {"description":"Count the function definitions in a Python source string.","sql":"SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python')"},
+-                      {"description":"Extract each Python import statement, one per row.","sql":"SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python')) AS import"},
+-                      {"description":"List the function symbols and their line spans in a Rust source string.","sql":"SELECT name, start_line, end_line FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust') WHERE kind = 'function'"},
+-                      {"description":"List every language id the worker can parse.","sql":"SELECT language FROM code.main.supported_languages ORDER BY language"}
+-                    ]"#
+-                        .to_string(),
+-                ),
++                crate::meta::example_queries_tag(&[
++                    ("Detect a file's language from its extension.", "SELECT code.main.language_of('src/main.rs')"),
++                    ("Count the lines of code (excluding blank and comment lines) in a Rust source string.", "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust')"),
++                    ("Count the function definitions in a Python source string.", "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python')"),
++                    ("Extract each Python import statement, one per row.", "SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python')) AS import"),
++                    ("List the function symbols and their line spans in a Rust source string.", "SELECT name, start_line, end_line FROM code.main.symbols('fn a() {}\nfn b() {}\n', 'rust') WHERE kind = 'function' ORDER BY start_line"),
++                    ("List every language id the worker can parse.", "SELECT language FROM code.main.supported_languages ORDER BY language"),
++                    // Composed: two or more of the worker's objects in one query.
++                    examples::FILE_METRICS,
++                    examples::CALL_GRAPH,
++                    examples::FUNCTION_METRICS,
++                ]),
+                 // VGI413: ordered category registry. Every function/table declares
+                 // a matching `vgi.category`; these drive the worker's navigation,
+                 // listing sections and SEO descriptions.
+diff --git a/crates/code-worker/src/meta.rs b/crates/code-worker/src/meta.rs
+index ead2513..f7453dc 100644
+--- a/crates/code-worker/src/meta.rs
++++ b/crates/code-worker/src/meta.rs
+@@ -52,6 +52,13 @@ fn json_escape(s: &str) -> String {
+ /// `duckdb_functions().examples` drops the per-example description, so every
+ /// function also publishes its examples through this tag, which preserves them.
+ pub fn example_queries_tag(examples: &[(&str, &str)]) -> (String, String) {
++    ("vgi.example_queries".to_string(), examples_json(examples))
++}
++
++/// Serialize `(description, sql)` pairs as the JSON list
++/// `[{"description":…,"sql":…}]` shared by `vgi.example_queries` and
++/// `vgi.executable_examples`.
++pub fn examples_json(examples: &[(&str, &str)]) -> String {
+     let items: Vec<String> = examples
+         .iter()
+         .map(|(desc, sql)| {
+@@ -62,10 +69,7 @@ pub fn example_queries_tag(examples: &[(&str, &str)]) -> (String, String) {
+             )
+         })
+         .collect();
+-    (
+-        "vgi.example_queries".to_string(),
+-        format!("[{}]", items.join(",")),
+-    )
++    format!("[{}]", items.join(","))
+ }
+ 
+ /// Build the standard per-object discovery/description tags.
+diff --git a/crates/code-worker/src/scalar/language.rs b/crates/code-worker/src/scalar/language.rs
+index cf15b4c..78682d3 100644
+--- a/crates/code-worker/src/scalar/language.rs
++++ b/crates/code-worker/src/scalar/language.rs
+@@ -39,19 +39,27 @@ impl ScalarFunction for LanguageOf {
+             "Language Detection & Discovery",
+             "scalar/language.rs",
+         );
+-        tags.push(crate::meta::example_queries_tag(&[(
+-            EXAMPLE_DESC,
+-            EXAMPLE_SQL,
+-        )]));
++        let (file_metrics_desc, file_metrics_sql) = crate::examples::FILE_METRICS;
++        tags.push(crate::meta::example_queries_tag(&[
++            (EXAMPLE_DESC, EXAMPLE_SQL),
++            (file_metrics_desc, file_metrics_sql),
++        ]));
+         FunctionMetadata {
+             description: "Infer the source language from a filename's extension (NULL if unknown)"
+                 .into(),
+             return_type: Some(DataType::Utf8),
+-            examples: vec![FunctionExample {
+-                sql: EXAMPLE_SQL.into(),
+-                description: EXAMPLE_DESC.into(),
+-                expected_output: None,
+-            }],
++            examples: vec![
++                FunctionExample {
++                    sql: EXAMPLE_SQL.into(),
++                    description: EXAMPLE_DESC.into(),
++                    expected_output: None,
++                },
++                FunctionExample {
++                    sql: file_metrics_sql.into(),
++                    description: file_metrics_desc.into(),
++                    expected_output: None,
++                },
++            ],
+             tags,
+             ..Default::default()
+         }
+diff --git a/crates/code-worker/src/table/supported_languages.rs b/crates/code-worker/src/table/supported_languages.rs
+index 46d0bf1..b364a08 100644
+--- a/crates/code-worker/src/table/supported_languages.rs
++++ b/crates/code-worker/src/table/supported_languages.rs
+@@ -16,44 +16,46 @@ use crate::parsing;
+ /// self-contained and re-runnable against an attached `code` worker. We omit
+ /// `expected_result` deliberately — the linter only needs each query to execute
+ /// cleanly, and the version string / row order would make exact output brittle.
+-const EXECUTABLE_EXAMPLES: &str = r#"[
+-  {
+-    "description": "List every language id the worker can parse.",
+-    "sql": "SELECT language FROM code.main.supported_languages() ORDER BY language"
+-  },
+-  {
+-    "description": "Detect a file's language from its extension.",
+-    "sql": "SELECT code.main.language_of('src/main.rs') AS lang"
+-  },
+-  {
+-    "description": "Count the physical lines in a source string.",
+-    "sql": "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n') AS lines"
+-  },
+-  {
+-    "description": "Count the lines of code, excluding blank and comment lines.",
+-    "sql": "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust') AS loc"
+-  },
+-  {
+-    "description": "Count function/method definitions in Python source.",
+-    "sql": "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python') AS fns"
+-  },
+-  {
+-    "description": "Extract the import statements from Python source.",
+-    "sql": "SELECT code.main.extract_imports('import os\nimport sys\n', 'python') AS imports"
+-  },
+-  {
+-    "description": "List the structural symbols of a Rust source doc.",
+-    "sql": "SELECT kind, name, start_line FROM code.main.symbols('fn alpha() {}\nfn beta() {}\n', 'rust') ORDER BY start_line"
+-  },
+-  {
+-    "description": "Run a tree-sitter query and read its captures as rows.",
+-    "sql": "SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq"
+-  },
+-  {
+-    "description": "Extract the comment texts from a Rust source string.",
+-    "sql": "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust') AS comments"
+-  }
+-]"#;
++const EXECUTABLE_EXAMPLES: &[(&str, &str)] = &[
++    (
++        "List every language id the worker can parse.",
++        "SELECT language FROM code.main.supported_languages() ORDER BY language",
++    ),
++    (
++        "Detect a file's language from its extension.",
++        "SELECT code.main.language_of('src/main.rs') AS lang",
++    ),
++    (
++        "Count the physical lines in a source string.",
++        "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n') AS lines",
++    ),
++    (
++        "Count the lines of code, excluding blank and comment lines.",
++        "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust') AS loc",
++    ),
++    (
++        "Count function/method definitions in Python source.",
++        "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python') AS fns",
++    ),
++    (
++        "Extract the import statements from Python source.",
++        "SELECT code.main.extract_imports('import os\nimport sys\n', 'python') AS imports",
++    ),
++    (
++        "List the structural symbols of a Rust source doc.",
++        "SELECT kind, name, start_line FROM code.main.symbols('fn alpha() {}\nfn beta() {}\n', 'rust') ORDER BY start_line",
++    ),
++    (
++        "Run a tree-sitter query and read its captures as rows.",
++        "SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq",
++    ),
++    (
++        "Extract the comment texts from a Rust source string.",
++        "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust') AS comments",
++    ),
++    // Composed: symbols' function spans joined with ts_nodes' call sites.
++    crate::examples::CALL_GRAPH,
++];
+ 
+ pub struct SupportedLanguages;
+ 
+@@ -106,7 +108,10 @@ impl TableFunction for SupportedLanguages {
+ ]"#
+             .into(),
+         ));
+-        tags.push(("vgi.executable_examples".into(), EXECUTABLE_EXAMPLES.into()));
++        tags.push((
++            "vgi.executable_examples".into(),
++            crate::meta::examples_json(EXECUTABLE_EXAMPLES),
++        ));
+         FunctionMetadata {
+             description: "List the language ids this worker can parse".into(),
+             tags,
+diff --git a/crates/code-worker/src/table/symbols.rs b/crates/code-worker/src/table/symbols.rs
+index b8dd2fd..130ead7 100644
+--- a/crates/code-worker/src/table/symbols.rs
++++ b/crates/code-worker/src/table/symbols.rs
+@@ -75,6 +75,7 @@ impl TableFunction for Symbols {
+                 "Count the defined symbols by kind in a Python source string.",
+                 "SELECT kind, count(*) AS n FROM code.main.symbols('class C:\n    def m(self): pass\ndef f(): pass\n', 'python') GROUP BY kind ORDER BY kind",
+             ),
++            crate::examples::CALL_GRAPH,
+         ]));
+         FunctionMetadata {
+             description:
+diff --git a/crates/code-worker/src/table/ts_nodes.rs b/crates/code-worker/src/table/ts_nodes.rs
+index e8c1e0e..a1c5c33 100644
+--- a/crates/code-worker/src/table/ts_nodes.rs
++++ b/crates/code-worker/src/table/ts_nodes.rs
+@@ -76,6 +76,7 @@ impl TableFunction for TsNodes {
+                 "Return just the captured node texts and their line spans.",
+                 "SELECT text, start_line FROM code.main.ts_nodes('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq",
+             ),
++            crate::examples::FUNCTION_METRICS,
+         ]));
+         FunctionMetadata {
+             description:

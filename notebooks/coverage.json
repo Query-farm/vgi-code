@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "catalogs": {
+    "released": {
+      "path": "coverage/catalog-release.json",
+      "sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+        "notes": "Actual native v0.4.0 complete worker-filtered function/table/view exports contain 11 logical public names. supported_languages is advertised as both a table and table function, counted once. No views, authenticated APIs or write APIs are omitted."
+      }
+    },
+    "current": {
+      "path": "coverage/catalog-current.json",
+      "sha256": "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "catalog_sha256": "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a",
+        "notes": "Complete registration and the retained seven-file release-to-current diff at aac464de592fe8397bbf4576b3f48d311359ad3d establish the same 11 names. Changes concern composed examples and catalog metadata; parsing logic, grammars, adapters, schemas and registrations are unchanged. Current coverage records reviewed interface compatibility, not actual current-main notebook execution."
+      }
+    }
+  },
+  "notebooks": [
+    {
+      "path": "01_review_functions_without_double_counting_lines.ipynb",
+      "sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+      "execution": {
+        "path": "coverage/run-01.json",
+        "sha256": "615f78ca2209d84ac7ca8187fe4234612f99275942c466c4a0e67e83b15b3563"
+      }
+    },
+    {
+      "path": "02_import_syntax_and_text_decoys.ipynb",
+      "sha256": "3777915e387b2806f7e1b9f0f28ec6aa9392d5107f174967a291c2ca08e19208",
+      "execution": {
+        "path": "coverage/run-02.json",
+        "sha256": "fd0397afc701e7c6eae48b9f814e29aedaea89c7c0244d9b3f289b461664027d"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "object": {
+        "schema": "main",
+        "name": "supported_languages"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "d45d3290",
+          "reference": "code.main.supported_languages"
+        }
+      ],
+      "narrative_cells": [
+        "9e6bfe26"
+      ],
+      "result_cells": [
+        "d45d3290"
+      ],
+      "interpretation_cells": [
+        "9e6bfe26"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Select and require the Python grammar before interpreting source structure.",
+        "finding": "The displayed release grammar list includes Python; the query checks exactly one Python entry before any source parsing. This is a runtime capability gate, not merely an inventory listing."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "language_of"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "e916b5ed",
+          "reference": "code.main.language_of"
+        },
+        {
+          "cell": "b5d9e887",
+          "reference": "code.main.language_of"
+        }
+      ],
+      "narrative_cells": [
+        "4dc2cc54",
+        "139e6f7c"
+      ],
+      "result_cells": [
+        "e916b5ed",
+        "b5d9e887"
+      ],
+      "interpretation_cells": [
+        "139e6f7c",
+        "c873d5d4"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Choose grammar per filename while preserving unavailable source and unsupported extension.",
+        "finding": "The Python filenames select python, notes.txt has no inferred grammar, and missing.py remains missing input. The latter two retain unavailable analysis instead of appearing as zero-function files."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "count_lines"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "b5d9e887",
+          "reference": "code.main.count_lines"
+        },
+        {
+          "cell": "11b35421",
+          "reference": "code.main.count_lines"
+        }
+      ],
+      "narrative_cells": [
+        "38bd8c78",
+        "1bf00e9b"
+      ],
+      "result_cells": [
+        "b5d9e887",
+        "855001b8",
+        "c873d5d4"
+      ],
+      "interpretation_cells": [
+        "855001b8"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Distinguish file length and captured physical lines from summed nested spans.",
+        "finding": "The module has 24 physical lines. Four function spans sum to 23 memberships but cover 19 unique lines. Returned capture lengths equal inclusive bounds; nested membership is counted twice in a sum."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "loc"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "b5d9e887",
+          "reference": "code.main.loc"
+        }
+      ],
+      "narrative_cells": [
+        "38bd8c78"
+      ],
+      "result_cells": [
+        "b5d9e887",
+        "855001b8"
+      ],
+      "interpretation_cells": [
+        "855001b8"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Compare worker LOC with physical line accounting without conflating their definitions.",
+        "finding": "The selected module has 18 nonblank noncomment LOC, 24 physical lines and 19 unique lines within functions. Docstrings are string nodes in this fixture and count as LOC; the metrics answer different questions."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "count_functions"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "b5d9e887",
+          "reference": "code.main.count_functions"
+        }
+      ],
+      "narrative_cells": [
+        "139e6f7c",
+        "1bf00e9b"
+      ],
+      "result_cells": [
+        "b5d9e887",
+        "ba7abc41",
+        "c873d5d4"
+      ],
+      "interpretation_cells": [
+        "ba7abc41"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Determine whether function count alone establishes a successfully parsed module.",
+        "finding": "The valid module has four functions matching the symbol table, but the incomplete fragment still returns two definitions. Function extraction survives parser recovery and is not a syntax-validity or compiler check."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "ts_query"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "b5d9e887",
+          "reference": "code.main.ts_query"
+        }
+      ],
+      "narrative_cells": [
+        "139e6f7c"
+      ],
+      "result_cells": [
+        "ba7abc41",
+        "b5d9e887"
+      ],
+      "interpretation_cells": [
+        "ba7abc41"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Screen for both ERROR nodes and zero-width MISSING captures before ranking functions.",
+        "finding": "The incomplete fragment returns zero ERROR captures and one empty-text MISSING capture. Counting captures rather than nonempty text detects the recovery condition; the selected module has neither signal."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "symbols"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "f2c7563a",
+          "reference": "code.main.symbols"
+        }
+      ],
+      "narrative_cells": [
+        "819bf62f",
+        "c1a79492",
+        "fbb45965"
+      ],
+      "result_cells": [
+        "f2c7563a",
+        "7d04818a",
+        "9bbcd6fd"
+      ],
+      "interpretation_cells": [
+        "9bbcd6fd",
+        "855001b8"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Join function names and full syntax captures using checked unique line bounds, then construct a threshold-based review queue.",
+        "finding": "prepare spans 2\u201313 and contains clamp at 4\u20137; summarize spans 16\u201320 and label 23\u201324. At threshold4 three functions qualify; threshold8 selects only prepare. Captures and line accounting remain fixed. A span threshold is a review rule, not complexity or quality."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "ts_nodes"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "sql": [
+        {
+          "cell": "f2c7563a",
+          "reference": "code.main.ts_nodes"
+        }
+      ],
+      "narrative_cells": [
+        "819bf62f",
+        "c1a79492",
+        "fbb45965"
+      ],
+      "result_cells": [
+        "f2c7563a",
+        "7d04818a",
+        "9bbcd6fd"
+      ],
+      "interpretation_cells": [
+        "9bbcd6fd",
+        "855001b8"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "c7809b280efb954080b94d34d88a8adb4a279a1d228fcd9ffea82ba3d25cec11",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Join function names and full syntax captures using checked unique line bounds, then construct a threshold-based review queue.",
+        "finding": "prepare spans 2\u201313 and contains clamp at 4\u20137; summarize spans 16\u201320 and label 23\u201324. At threshold4 three functions qualify; threshold8 selects only prepare. Captures and line accounting remain fixed. A span threshold is a review rule, not complexity or quality."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "extract_imports"
+      },
+      "notebook": "02_import_syntax_and_text_decoys.ipynb",
+      "sql": [
+        {
+          "cell": "extract-results",
+          "reference": "code.main.extract_imports"
+        }
+      ],
+      "narrative_cells": [
+        "extract-story",
+        "comparison-story",
+        "statements-story"
+      ],
+      "result_cells": [
+        "extract-results",
+        "comparison-figure",
+        "statement-results"
+      ],
+      "interpretation_cells": [
+        "comparison-figure",
+        "statements-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "3777915e387b2806f7e1b9f0f28ec6aa9392d5107f174967a291c2ca08e19208",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Distinguish parsed imports from import-shaped text in one controlled module.",
+        "finding": "Both actual statements are retained: import math and from pathlib import Path. Removing decoys leaves two statements while the import-substring line count falls from four to two. The fixture has one statement per line; these counts do not establish runtime dependencies. NULL source remains unknown rather than an empty parsed inventory."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "extract_comments"
+      },
+      "notebook": "02_import_syntax_and_text_decoys.ipynb",
+      "sql": [
+        {
+          "cell": "extract-results",
+          "reference": "code.main.extract_comments"
+        }
+      ],
+      "narrative_cells": [
+        "extract-story",
+        "comparison-story",
+        "statements-story"
+      ],
+      "result_cells": [
+        "extract-results",
+        "comparison-figure",
+        "statement-results"
+      ],
+      "interpretation_cells": [
+        "comparison-figure",
+        "statements-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "3777915e387b2806f7e1b9f0f28ec6aa9392d5107f174967a291c2ca08e19208",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Distinguish parsed comments from import-shaped text in one controlled module.",
+        "finding": "The optional comment containing import secrets is retained as a comment, explaining one false match in the substring scan. Removing decoys makes the comment list empty without changing actual imports. The fixture has one statement per line; these counts do not establish runtime dependencies. NULL source remains unknown rather than an empty parsed inventory."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "extract_strings"
+      },
+      "notebook": "02_import_syntax_and_text_decoys.ipynb",
+      "sql": [
+        {
+          "cell": "extract-results",
+          "reference": "code.main.extract_strings"
+        }
+      ],
+      "narrative_cells": [
+        "extract-story",
+        "comparison-story",
+        "statements-story"
+      ],
+      "result_cells": [
+        "extract-results",
+        "comparison-figure",
+        "statement-results"
+      ],
+      "interpretation_cells": [
+        "comparison-figure",
+        "statements-story"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T19:38:21.845351+00:00",
+        "notebook_sha256": "3777915e387b2806f7e1b9f0f28ec6aa9392d5107f174967a291c2ca08e19208",
+        "catalog_sha256": [
+          "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+          "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a"
+        ],
+        "purpose": "Distinguish parsed string literals from import-shaped text in one controlled module.",
+        "finding": "The optional import socket text is returned as a string literal, explaining the second false substring match. Removing decoys makes the string list empty while both actual import statements remain. The fixture has one statement per line; these counts do not establish runtime dependencies. NULL source remains unknown rather than an empty parsed inventory."
+      }
+    }
+  ]
+}

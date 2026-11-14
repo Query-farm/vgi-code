@@ -1,0 +1,4 @@
+Running 01_review_functions_without_double_counting_lines.ipynb ...
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+OK: 18 code cells, 2 charts, 2.6s
+Saved notebooks/artifacts/threshold-8/01_review_functions_without_double_counting_lines.ipynb

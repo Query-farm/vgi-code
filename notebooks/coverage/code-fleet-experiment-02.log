@@ -1,0 +1,4 @@
+Running 02_import_syntax_and_text_decoys.ipynb ...
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+OK: 11 code cells, 1 charts, 2.5s
+Saved notebooks/artifacts/no-decoys/02_import_syntax_and_text_decoys.ipynb

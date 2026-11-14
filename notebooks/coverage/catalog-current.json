@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "repository": "Query-farm/vgi-code",
+  "revision": "aac464de592fe8397bbf4576b3f48d311359ad3d",
+  "captured_at": "2026-11-14T19:30:09.388405+00:00",
+  "default_schema": "main",
+  "scope": "all_public_functions_and_tables",
+  "complete": true,
+  "objects": [
+    {
+      "schema": "main",
+      "name": "count_functions",
+      "kind": "function",
+      "signatures": [
+        "count_functions(VARCHAR, VARCHAR) -> INTEGER"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "count_lines",
+      "kind": "function",
+      "signatures": [
+        "count_lines(VARCHAR) -> INTEGER"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "extract_comments",
+      "kind": "function",
+      "signatures": [
+        "extract_comments(VARCHAR, VARCHAR) -> VARCHAR[]"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "extract_imports",
+      "kind": "function",
+      "signatures": [
+        "extract_imports(VARCHAR, VARCHAR) -> VARCHAR[]"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "extract_strings",
+      "kind": "function",
+      "signatures": [
+        "extract_strings(VARCHAR, VARCHAR) -> VARCHAR[]"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "language_of",
+      "kind": "function",
+      "signatures": [
+        "language_of(VARCHAR) -> VARCHAR"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "loc",
+      "kind": "function",
+      "signatures": [
+        "loc(VARCHAR, VARCHAR) -> INTEGER"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "supported_languages",
+      "kind": "function",
+      "signatures": [
+        "supported_languages() -> None"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "symbols",
+      "kind": "function",
+      "signatures": [
+        "symbols(VARCHAR, VARCHAR) -> None"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "ts_nodes",
+      "kind": "function",
+      "signatures": [
+        "ts_nodes(VARCHAR, VARCHAR, VARCHAR) -> None"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "ts_query",
+      "kind": "function",
+      "signatures": [
+        "ts_query(VARCHAR, VARCHAR, VARCHAR) -> VARCHAR[]"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "supported_languages",
+      "kind": "table",
+      "signatures": [
+        "TABLE"
+      ],
+      "authentication": "none",
+      "access": "read"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "coverage/current-registration.rs",
+      "sha256": "7be3f0d6f18c400ed3e501ac4c433cd57b98bde2f0f0e2b7fd5e241446c4bcdd",
+      "description": "Current interface established by full source/registration review against actual released catalog"
+    },
+    {
+      "path": "coverage/released-registration.rs",
+      "sha256": "db662bf0f6a02158fb9a9645208fdb14967bdc7c42a7329302dce7b53be242c9",
+      "description": "Current interface established by full source/registration review against actual released catalog"
+    },
+    {
+      "path": "coverage/release-to-current.diff",
+      "sha256": "ff30e5e055ad9a5bc54fb967adfa9a85f73af1b45868610ea2a03c3021ad6c04",
+      "description": "Current interface established by full source/registration review against actual released catalog"
+    },
+    {
+      "path": "coverage/source-review.json",
+      "sha256": "0bf21f062e17cda6873413bbc7545c30ee3dfa0a6ef37c52d9317c5544ff2dd4",
+      "description": "Current interface established by full source/registration review against actual released catalog"
+    }
+  ]
+}

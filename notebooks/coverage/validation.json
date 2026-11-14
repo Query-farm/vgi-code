@@ -1,0 +1,791 @@
+{
+  "schema_version": 1,
+  "status": "met",
+  "meets_target": true,
+  "catalogs": {
+    "released": {
+      "catalog_status": "verified",
+      "revision": "v0.4.0",
+      "catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244",
+      "collection_reconciled": true,
+      "denominator": 11,
+      "observed_objects": 11,
+      "required": 6,
+      "verified_count": 11,
+      "candidate_count": 0,
+      "fraction": 1.0,
+      "meets_target": true,
+      "exact_runtime_count": 11,
+      "runtime_revisions": [
+        "v0.4.0"
+      ],
+      "covered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_functions"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_lines"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_comments"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_imports"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_strings"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "language_of"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "loc"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "supported_languages"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "symbols"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_nodes"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_query"
+        }
+      ],
+      "uncovered": [],
+      "objects": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_functions",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "count_functions(VARCHAR, VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_lines",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "count_lines(VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_comments",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "extract_comments(VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_imports",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "extract_imports(VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_strings",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "extract_strings(VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "language_of",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "language_of(VARCHAR) -> VARCHAR"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "loc",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "loc(VARCHAR, VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "supported_languages",
+          "kinds": [
+            "function",
+            "table"
+          ],
+          "signatures": [
+            "TABLE",
+            "supported_languages() -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "symbols",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "symbols(VARCHAR, VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_nodes",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "ts_nodes(VARCHAR, VARCHAR, VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_query",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "ts_query(VARCHAR, VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        }
+      ],
+      "issues": []
+    },
+    "current": {
+      "catalog_status": "verified",
+      "revision": "aac464de592fe8397bbf4576b3f48d311359ad3d",
+      "catalog_sha256": "9971cd9847201668a4f27b2d730c8efe253ac48c2f8e57aac0f6770aaa44669a",
+      "collection_reconciled": false,
+      "denominator": 11,
+      "observed_objects": 11,
+      "required": 6,
+      "verified_count": 11,
+      "candidate_count": 0,
+      "fraction": 1.0,
+      "meets_target": true,
+      "exact_runtime_count": 0,
+      "runtime_revisions": [
+        "v0.4.0"
+      ],
+      "covered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_functions"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_lines"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_comments"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_imports"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_strings"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "language_of"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "loc"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "supported_languages"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "symbols"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_nodes"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_query"
+        }
+      ],
+      "uncovered": [],
+      "objects": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_functions",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "count_functions(VARCHAR, VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "count_lines",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "count_lines(VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_comments",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "extract_comments(VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_imports",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "extract_imports(VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "extract_strings",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "extract_strings(VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "language_of",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "language_of(VARCHAR) -> VARCHAR"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "loc",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "loc(VARCHAR, VARCHAR) -> INTEGER"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "supported_languages",
+          "kinds": [
+            "function",
+            "table"
+          ],
+          "signatures": [
+            "TABLE",
+            "supported_languages() -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "symbols",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "symbols(VARCHAR, VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_nodes",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "ts_nodes(VARCHAR, VARCHAR, VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "ts_query",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "ts_query(VARCHAR, VARCHAR, VARCHAR) -> VARCHAR[]"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        }
+      ],
+      "issues": []
+    }
+  },
+  "interface_drift": {
+    "known": true,
+    "current_only": [],
+    "released_only": [],
+    "changed": []
+  },
+  "notebooks": {
+    "01_review_functions_without_double_counting_lines.ipynb": {
+      "verified": true,
+      "issues": []
+    },
+    "02_import_syntax_and_text_decoys.ipynb": {
+      "verified": true,
+      "issues": []
+    }
+  },
+  "examples": [
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "supported_languages"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "language_of"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "count_lines"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "loc"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "count_functions"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "ts_query"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "symbols"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "ts_nodes"
+      },
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "extract_imports"
+      },
+      "notebook": "02_import_syntax_and_text_decoys.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "extract_comments"
+      },
+      "notebook": "02_import_syntax_and_text_decoys.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "extract_strings"
+      },
+      "notebook": "02_import_syntax_and_text_decoys.ipynb",
+      "runtime_revision": "v0.4.0",
+      "runtime_catalog_sha256": "f76eb8d3b4e64f8211ebb78e6de95cca377e70e43e91044714205ca0f874b244"
+    }
+  ],
+  "issues": []
+}

@@ -1,0 +1,15 @@
+{
+  "released_commit": "633c5cdcc2e8145c6ed0f7aebc9b4fe116aa4f29",
+  "current_commit": "aac464de592fe8397bbf4576b3f48d311359ad3d",
+  "changed_runtime_paths": [
+    "crates/code-worker/src/examples.rs",
+    "crates/code-worker/src/lib.rs",
+    "crates/code-worker/src/meta.rs",
+    "crates/code-worker/src/scalar/language.rs",
+    "crates/code-worker/src/table/supported_languages.rs",
+    "crates/code-worker/src/table/symbols.rs",
+    "crates/code-worker/src/table/ts_nodes.rs"
+  ],
+  "review": "All seven changes add or refactor composed example/discovery metadata. The language scalar changes only examples, supported_languages changes only executable examples, symbol/table functions only add example tags, and metadata JSON helper is factored out for reuse. Parsing logic, grammar dependencies, process callbacks, schemas and registration names are unchanged. Full retained diff and both complete registration sources were reviewed.",
+  "analytical_source_changes": false
+}

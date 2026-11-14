@@ -1,0 +1,28 @@
+{
+  "checks": [
+    {
+      "notebook": "01_review_functions_without_double_counting_lines.ipynb",
+      "experiment": "threshold-8",
+      "unchanged_output_cells": [
+        "b5d9e887",
+        "ba7abc41",
+        "f2c7563a",
+        "855001b8",
+        "c873d5d4"
+      ],
+      "passed": true
+    },
+    {
+      "notebook": "02_import_syntax_and_text_decoys.ipynb",
+      "experiment": "no-decoys",
+      "unchanged_output_cells": [
+        "checks-output"
+      ],
+      "passed": true
+    }
+  ],
+  "findings": {
+    "MIN_SPAN_LINES_4_to_8": "Selected names prepare/summarize/clamp -> prepare; audit, spans, accounting and seven SQL checks identical.",
+    "INCLUDE_DECOYS_true_to_false": "Substring lines 4 -> 2; imports 2 -> 2; comments 1 -> 0; strings 1 -> 0; all five checks pass. All six default/experiment figures reviewed."
+  }
+}

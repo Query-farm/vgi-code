@@ -1,0 +1,51 @@
+{
+  "query": "SELECT * FROM duckdb_tables() WHERE database_name='code' ORDER BY schema_name,table_name",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "schema_oid",
+    "table_name",
+    "table_oid",
+    "comment",
+    "tags",
+    "internal",
+    "temporary",
+    "has_primary_key",
+    "estimated_size",
+    "column_count",
+    "index_count",
+    "check_constraint_count",
+    "sql"
+  ],
+  "rows": [
+    [
+      "code",
+      22592,
+      "main",
+      22737,
+      "supported_languages",
+      22738,
+      "The language ids this worker can parse, one per row (the accepted `language` argument values for the other functions).",
+      {
+        "category": "code-analysis",
+        "domain": "software-engineering",
+        "topic": "source-structure",
+        "vgi.category": "Language Detection & Discovery",
+        "vgi.doc_llm": "The set of language ids this worker can parse, one per row in the `language` column. These are the exact values accepted as the `language` argument by loc, count_functions, the extract_* functions, ts_query, symbols and ts_nodes. Query it to discover which languages are available.",
+        "vgi.doc_md": "The language ids this worker can parse (column: `language`).",
+        "vgi.example_queries": "[{\"description\":\"List every language id the worker can parse.\",\"sql\":\"SELECT language FROM code.main.supported_languages ORDER BY language\"},{\"description\":\"Check whether a language is supported.\",\"sql\":\"SELECT count(*) > 0 AS supported FROM code.main.supported_languages WHERE language = 'rust'\"}]",
+        "vgi.keywords": "[\"supported languages\",\"list languages\",\"available languages\",\"language ids\",\"discovery\",\"grammars\"]",
+        "vgi.title": "Parseable Source Languages"
+      },
+      false,
+      false,
+      true,
+      0,
+      1,
+      1,
+      0,
+      "CREATE TABLE supported_languages(\"language\" VARCHAR, PRIMARY KEY(\"language\"));"
+    ]
+  ]
+}

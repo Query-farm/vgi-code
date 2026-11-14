@@ -1,0 +1,437 @@
+{
+  "query": "SELECT * FROM duckdb_functions() WHERE database_name='code' ORDER BY schema_name,function_name",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "function_name",
+    "alias_of",
+    "function_type",
+    "description",
+    "comment",
+    "tags",
+    "return_type",
+    "parameters",
+    "parameter_types",
+    "varargs",
+    "macro_definition",
+    "has_side_effects",
+    "internal",
+    "extension_name",
+    "function_oid",
+    "examples",
+    "stability",
+    "categories"
+  ],
+  "rows": [
+    [
+      "code",
+      "22592",
+      "main",
+      "count_functions",
+      null,
+      "scalar",
+      "Number of function/method definitions for the given language",
+      null,
+      {
+        "vgi.category": "Code Metrics",
+        "vgi.doc_llm": "Count the function and method definitions in a source string for a given language, using tree-sitter to find definition nodes. Returns NULL when the source or language is NULL; an unknown language id is a clear error. Use it as a quick structural metric of how many functions a file defines.",
+        "vgi.doc_md": "Number of function/method definitions for a language, e.g. `count_functions(src, 'python')` \u2192 `2`.",
+        "vgi.example_queries": "[{\"description\":\"Count function/method definitions in the source (\u2192 2).\",\"sql\":\"SELECT code.main.count_functions('def a(): pass\\ndef b(): pass\\n', 'python');\"}]",
+        "vgi.keywords": "[\"count functions\",\"function count\",\"number of functions\",\"methods\",\"definitions\",\"code metrics\",\"complexity\"]",
+        "vgi.title": "Count Function Definitions"
+      },
+      "INTEGER",
+      [
+        "source",
+        "language"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22596,
+      [
+        "SELECT code.main.count_functions('def a(): pass\ndef b(): pass\n', 'python');"
+      ],
+      "CONSISTENT",
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "count_lines",
+      null,
+      "scalar",
+      "Total number of physical lines in the source (NULL \u2192 NULL)",
+      null,
+      {
+        "vgi.category": "Code Metrics",
+        "vgi.doc_llm": "Count the total number of physical lines in a source string, including blank and comment lines. Language-agnostic (no parsing). A single trailing newline is NOT counted as an extra line, so 'a\\nb\\n' and 'a\\nb' both report 2; an empty string reports 0. Returns NULL when the source is NULL. Use it for raw file-size / line-count metrics.",
+        "vgi.doc_md": "Total physical lines in the source, e.g. `count_lines('a\\nb\\n')` \u2192 `2`. NULL in \u2192 NULL.",
+        "vgi.example_queries": "[{\"description\":\"Count the physical lines in a source string (\u2192 2).\",\"sql\":\"SELECT code.main.count_lines('fn a() {}\\nfn b() {}\\n');\"}]",
+        "vgi.keywords": "[\"count lines\",\"line count\",\"physical lines\",\"total lines\",\"file size\",\"metrics\",\"wc -l\"]",
+        "vgi.title": "Count Physical Lines"
+      },
+      "INTEGER",
+      [
+        "source"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22597,
+      [
+        "SELECT code.main.count_lines('fn a() {}\nfn b() {}\n');"
+      ],
+      "CONSISTENT",
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "extract_comments",
+      null,
+      "scalar",
+      "Comment texts in the source, as a VARCHAR[]",
+      null,
+      {
+        "vgi.category": "Structure & Extraction",
+        "vgi.doc_llm": "Extract the comment texts (line and block comments) from a source string for a given language, returned as a `VARCHAR[]`. NULL source or language \u2192 NULL list; empty source \u2192 empty list; an unknown language is a clear error. Use it to mine documentation, TODOs, or license headers.",
+        "vgi.doc_md": "Comment texts as a `VARCHAR[]`, e.g. `extract_comments(src, 'rust')`.",
+        "vgi.example_queries": "[{\"description\":\"Collect the comment texts from Rust source as a VARCHAR[].\",\"sql\":\"SELECT code.main.extract_comments('// header\\nfn a() {}\\n', 'rust');\"}]",
+        "vgi.keywords": "[\"comments\",\"extract comments\",\"docstrings\",\"todo\",\"fixme\",\"documentation\",\"license header\",\"annotations\"]",
+        "vgi.title": "Extract Comment Texts"
+      },
+      "VARCHAR[]",
+      [
+        "source",
+        "language"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22598,
+      [
+        "SELECT code.main.extract_comments('// header\nfn a() {}\n', 'rust');"
+      ],
+      "CONSISTENT",
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "extract_imports",
+      null,
+      "scalar",
+      "Import / use / require statements in the source, as a VARCHAR[]",
+      null,
+      {
+        "vgi.category": "Structure & Extraction",
+        "vgi.doc_llm": "Extract the import / use / require statements from a source string for a given language, returned as a `VARCHAR[]` of the statement texts. NULL source or language \u2192 NULL list; an empty source \u2192 empty list; an unknown language is a clear error. Use it to discover a file's dependencies.",
+        "vgi.doc_md": "Import/use/require statements as a `VARCHAR[]`, e.g. `extract_imports(src, 'python')`.",
+        "vgi.example_queries": "[{\"description\":\"Extract each import statement from Python source, one per row.\",\"sql\":\"SELECT UNNEST(code.main.extract_imports('import os\\nimport sys\\n', 'python'));\"}]",
+        "vgi.keywords": "[\"imports\",\"extract imports\",\"dependencies\",\"use statements\",\"require\",\"include\",\"import list\",\"modules\"]",
+        "vgi.title": "Extract Import Statements"
+      },
+      "VARCHAR[]",
+      [
+        "source",
+        "language"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22599,
+      [
+        "SELECT UNNEST(code.main.extract_imports('import os\nimport sys\n', 'python'));"
+      ],
+      "CONSISTENT",
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "extract_strings",
+      null,
+      "scalar",
+      "String-literal texts in the source, as a VARCHAR[]",
+      null,
+      {
+        "vgi.category": "Structure & Extraction",
+        "vgi.doc_llm": "Extract the string-literal texts from a source string for a given language, returned as a `VARCHAR[]` (the literals including their quotes). NULL source or language \u2192 NULL list; empty source \u2192 empty list; an unknown language is a clear error. Use it to find hard-coded strings, secrets, or URLs.",
+        "vgi.doc_md": "String-literal texts as a `VARCHAR[]`, e.g. `extract_strings(src, 'rust')`.",
+        "vgi.example_queries": "[{\"description\":\"Collect the string-literal texts from Rust source as a VARCHAR[].\",\"sql\":\"SELECT code.main.extract_strings('let s = \\\"hello\\\";\\n', 'rust');\"}]",
+        "vgi.keywords": "[\"strings\",\"extract strings\",\"string literals\",\"hardcoded strings\",\"secrets\",\"urls\",\"text literals\"]",
+        "vgi.title": "Extract String Literals"
+      },
+      "VARCHAR[]",
+      [
+        "source",
+        "language"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22600,
+      [
+        "SELECT code.main.extract_strings('let s = \"hello\";\n', 'rust');"
+      ],
+      "CONSISTENT",
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "language_of",
+      null,
+      "scalar",
+      "Infer the source language from a filename's extension (NULL if unknown)",
+      null,
+      {
+        "vgi.category": "Language Detection & Discovery",
+        "vgi.doc_llm": "Infer the programming language of a file from its name or path extension, e.g. 'src/main.rs' \u2192 'rust', 'app.py' \u2192 'python'. Returns NULL when the filename is NULL or its extension maps to no supported language. Use it to route files to the right language id for the other functions.",
+        "vgi.doc_md": "Infer a file's language from its extension, e.g. `language_of('main.rs')` \u2192 `'rust'`. NULL if unknown.",
+        "vgi.example_queries": "[{\"description\":\"Detect the source language of a file from its extension (\u2192 'rust').\",\"sql\":\"SELECT code.main.language_of('src/main.rs');\"}]",
+        "vgi.keywords": "[\"language detection\",\"language_of\",\"detect language\",\"file extension\",\"file type\",\"guess language\",\"rust\",\"python\",\"javascript\",\"typescript\",\"go\",\"java\",\"c\",\"cpp\",\"json\"]",
+        "vgi.title": "Detect Source Language"
+      },
+      "VARCHAR",
+      [
+        "filename"
+      ],
+      [
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22601,
+      [
+        "SELECT code.main.language_of('src/main.rs');"
+      ],
+      "CONSISTENT",
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "loc",
+      null,
+      "scalar",
+      "Lines of code: non-blank, non-comment lines for the given language",
+      null,
+      {
+        "vgi.category": "Code Metrics",
+        "vgi.doc_llm": "Count the lines of code (LOC) in a source string for a given language: physical lines that are neither blank nor purely comments. Returns NULL when the source or language is NULL; an unknown language id is a clear error. Use it for code-size metrics that ignore whitespace and comments.",
+        "vgi.doc_md": "Non-blank, non-comment lines for a language, e.g. `loc(src, 'rust')`. NULL in \u2192 NULL; unknown language errors.",
+        "vgi.example_queries": "[{\"description\":\"Count lines of code, excluding blank and comment lines (\u2192 2).\",\"sql\":\"SELECT code.main.loc('fn a() {}\\n// note\\nfn b() {}\\n', 'rust');\"}]",
+        "vgi.keywords": "[\"lines of code\",\"loc\",\"sloc\",\"code metrics\",\"non-comment lines\",\"effective lines\",\"source lines\"]",
+        "vgi.title": "Lines Of Code"
+      },
+      "INTEGER",
+      [
+        "source",
+        "language"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22602,
+      [
+        "SELECT code.main.loc('fn a() {}\n// note\nfn b() {}\n', 'rust');"
+      ],
+      "CONSISTENT",
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "supported_languages",
+      null,
+      "table",
+      "List the language ids this worker can parse",
+      null,
+      {
+        "vgi.category": "Language Detection & Discovery",
+        "vgi.doc_llm": "List every language id this worker can parse, one per row. These are the exact values accepted as the `language` argument by language_of, loc, count_functions, the extract_* functions, ts_query, symbols and ts_nodes. Use it to discover which languages are available.",
+        "vgi.doc_md": "List the language ids this worker can parse. Column: `language`.",
+        "vgi.executable_examples": "[\n  {\n    \"description\": \"List every language id the worker can parse.\",\n    \"sql\": \"SELECT language FROM code.main.supported_languages() ORDER BY language\"\n  },\n  {\n    \"description\": \"Detect a file's language from its extension.\",\n    \"sql\": \"SELECT code.main.language_of('src/main.rs') AS lang\"\n  },\n  {\n    \"description\": \"Count the physical lines in a source string.\",\n    \"sql\": \"SELECT code.main.count_lines('fn a() {}\\nfn b() {}\\n') AS lines\"\n  },\n  {\n    \"description\": \"Count the lines of code, excluding blank and comment lines.\",\n    \"sql\": \"SELECT code.main.loc('fn a() {}\\n// note\\nfn b() {}\\n', 'rust') AS loc\"\n  },\n  {\n    \"description\": \"Count function/method definitions in Python source.\",\n    \"sql\": \"SELECT code.main.count_functions('def a(): pass\\ndef b(): pass\\n', 'python') AS fns\"\n  },\n  {\n    \"description\": \"Extract the import statements from Python source.\",\n    \"sql\": \"SELECT code.main.extract_imports('import os\\nimport sys\\n', 'python') AS imports\"\n  },\n  {\n    \"description\": \"List the structural symbols of a Rust source doc.\",\n    \"sql\": \"SELECT kind, name, start_line FROM code.main.symbols('fn alpha() {}\\nfn beta() {}\\n', 'rust') ORDER BY start_line\"\n  },\n  {\n    \"description\": \"Run a tree-sitter query and read its captures as rows.\",\n    \"sql\": \"SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq\"\n  },\n  {\n    \"description\": \"Extract the comment texts from a Rust source string.\",\n    \"sql\": \"SELECT code.main.extract_comments('// header\\nfn a() {}\\n', 'rust') AS comments\"\n  }\n]",
+        "vgi.keywords": "[\"supported languages\",\"list languages\",\"available languages\",\"language ids\",\"discovery\",\"what languages\",\"grammars\"]",
+        "vgi.result_columns_schema": "[\n  {\"name\":\"language\",\"type\":\"VARCHAR\",\"description\":\"A language id accepted by the other functions, e.g. rust, python, go.\"}\n]",
+        "vgi.title": "Supported Languages Catalog"
+      },
+      null,
+      [],
+      [],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22604,
+      [],
+      null,
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "symbols",
+      null,
+      "table",
+      "Structural symbols (functions, classes, methods, structs, enums, \u2026) of a source doc",
+      null,
+      {
+        "vgi.category": "Structure & Extraction",
+        "vgi.doc_llm": "List the structural symbols of one source document \u2014 functions, methods, classes, structs, enums, interfaces and traits \u2014 one row each, ordered by start line, with their kind, name and 1-based line span. `source` and `language` are bind-time constants. NULL source \u2192 no rows; malformed source is best-effort (tree-sitter recovers); an unknown language is a clear error. Use it to outline or index a file's definitions.",
+        "vgi.doc_md": "Structural symbols of a source doc as `(kind, name, start_line, end_line)` rows, e.g. `symbols('fn a() {}', 'rust')`.",
+        "vgi.example_queries": "[{\"description\":\"List the function symbols and their line spans in a Rust source string.\",\"sql\":\"SELECT name, start_line, end_line FROM code.main.symbols('fn a() {}\\nfn b() {}\\n', 'rust') WHERE kind = 'function' ORDER BY start_line\"},{\"description\":\"Count the defined symbols by kind in a Python source string.\",\"sql\":\"SELECT kind, count(*) AS n FROM code.main.symbols('class C:\\n    def m(self): pass\\ndef f(): pass\\n', 'python') GROUP BY kind ORDER BY kind\"}]",
+        "vgi.keywords": "[\"symbols\",\"outline\",\"definitions\",\"functions\",\"classes\",\"methods\",\"structs\",\"enums\",\"traits\",\"interfaces\",\"code index\",\"navigation\",\"table of contents\"]",
+        "vgi.result_columns_schema": "[\n  {\"name\":\"kind\",\"type\":\"VARCHAR\",\"description\":\"Symbol kind: one of function, method, class, struct, enum, interface, or trait.\"},\n  {\"name\":\"name\",\"type\":\"VARCHAR\",\"description\":\"The symbol's identifier (NULL when the definition is anonymous).\"},\n  {\"name\":\"start_line\",\"type\":\"INTEGER\",\"description\":\"1-based line where the definition starts.\"},\n  {\"name\":\"end_line\",\"type\":\"INTEGER\",\"description\":\"1-based line where the definition ends.\"}\n]",
+        "vgi.title": "Source Symbols Listing"
+      },
+      null,
+      [
+        "source",
+        "language"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22605,
+      [],
+      null,
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "ts_nodes",
+      null,
+      "table",
+      "Tree-sitter query matches over a source doc as (seq, capture, text, start_line, end_line) rows",
+      null,
+      {
+        "vgi.category": "Tree-sitter Queries",
+        "vgi.doc_llm": "Run a tree-sitter S-expression query over one source document and return every capture as a row: a document-order sequence number, the capture name, the captured node's text, and its 1-based line span. `source`, `language` and `query` are bind-time constants. NULL source \u2192 no rows; an unknown language or malformed query is a clear error. The table-shaped counterpart to ts_query, for rich structural extraction.",
+        "vgi.doc_md": "Tree-sitter query captures as `(seq, capture, text, start_line, end_line)` rows, e.g. `ts_nodes(src, 'rust', '(function_item) @f')`.",
+        "vgi.example_queries": "[{\"description\":\"Return each tree-sitter capture's name and text in document order.\",\"sql\":\"SELECT capture, text FROM code.main.ts_nodes('fn alpha() {}\\nfn beta() {}\\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq\"},{\"description\":\"Return just the captured node texts and their line spans.\",\"sql\":\"SELECT text, start_line FROM code.main.ts_nodes('fn alpha() {}\\nfn beta() {}\\n', 'rust', '(function_item name: (identifier) @n)') ORDER BY seq\"}]",
+        "vgi.keywords": "[\"tree-sitter\",\"ts_nodes\",\"query\",\"captures\",\"structural search\",\"ast\",\"nodes\",\"s-expression\",\"syntax tree\",\"extraction\"]",
+        "vgi.result_columns_schema": "[\n  {\"name\":\"seq\",\"type\":\"BIGINT\",\"description\":\"0-based capture index in document order.\"},\n  {\"name\":\"capture\",\"type\":\"VARCHAR\",\"description\":\"The query capture name (the @name in the tree-sitter query).\"},\n  {\"name\":\"text\",\"type\":\"VARCHAR\",\"description\":\"The captured node's source text.\"},\n  {\"name\":\"start_line\",\"type\":\"INTEGER\",\"description\":\"1-based line where the captured node starts.\"},\n  {\"name\":\"end_line\",\"type\":\"INTEGER\",\"description\":\"1-based line where the captured node ends.\"}\n]",
+        "vgi.title": "Tree-Sitter Query Nodes"
+      },
+      null,
+      [
+        "source",
+        "language",
+        "query"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22606,
+      [],
+      null,
+      []
+    ],
+    [
+      "code",
+      "22592",
+      "main",
+      "ts_query",
+      null,
+      "scalar",
+      "Run a tree-sitter query over the source and return the captured node texts (`VARCHAR[]`)",
+      null,
+      {
+        "vgi.category": "Tree-sitter Queries",
+        "vgi.doc_llm": "Run an arbitrary tree-sitter S-expression query over a source string for a given language and return every captured node's text as a `VARCHAR[]`. The power feature for ad-hoc structural search. NULL source/language/query \u2192 NULL list; an unknown language or a malformed query is a clear error.",
+        "vgi.doc_md": "Run a tree-sitter query and return captured node texts as a `VARCHAR[]`, e.g. `ts_query(src, 'rust', '(function_item name: (identifier) @n)')`.",
+        "vgi.example_queries": "[{\"description\":\"Run a tree-sitter query and return captured node texts (here, the two function names).\",\"sql\":\"SELECT code.main.ts_query('fn alpha() {}\\nfn beta() {}\\n', 'rust', '(function_item name: (identifier) @n)');\"}]",
+        "vgi.keywords": "[\"tree-sitter\",\"ts_query\",\"query\",\"structural search\",\"capture\",\"ast query\",\"s-expression\",\"pattern match\",\"syntax tree\"]",
+        "vgi.title": "Run Tree-Sitter Query"
+      },
+      "VARCHAR[]",
+      [
+        "source",
+        "language",
+        "query"
+      ],
+      [
+        "VARCHAR",
+        "VARCHAR",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22603,
+      [
+        "SELECT code.main.ts_query('fn alpha() {}\nfn beta() {}\n', 'rust', '(function_item name: (identifier) @n)');"
+      ],
+      "CONSISTENT",
+      []
+    ]
+  ]
+}

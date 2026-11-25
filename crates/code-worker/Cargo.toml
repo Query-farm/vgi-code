@@ -37,7 +37,7 @@ log = "0.4"
 # The SDK's real default features (sqlite + transport-http) plus the HTTP RPC
 # codec and env_logger — unchanged from before the wasm split.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-vgi = { workspace = true, features = ["sqlite", "transport-http"] }
+vgi = { workspace = true, features = ["sqlite", "transport-http", "blob-vendor"] }
 vgi-rpc = { workspace = true, features = ["http"] }
 env_logger = "0.11"
 
